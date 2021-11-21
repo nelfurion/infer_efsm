@@ -1,0 +1,7 @@
+# assume the account amount is 75
+# In the first run we can't withdraw 150
+# In the second we can withdraw 50, so the output is 50, 25 - 50 withdrawn and 25 left in account
+
+select_operation("withdraw"), select_amount(150)/[], enter_pin(1111)/[], check_account()/["not enough money in account"]
+select_operation("withdraw"), select_amount(50)/[], enter_pin(1111)/[], check_account()/[], give_money()/["50, 25"]
+select_operation("withdraw"), select_amount(50)/[], enter_pin(0000)/["wrong pin"]

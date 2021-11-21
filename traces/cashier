@@ -1,0 +1,6 @@
+# This simple cashier model that requires 4 states. This requirement comes purely from the fact that there are 4 events.
+# This system can be optimized if the coffee type is inputted in the select event, and then it would only require 3 states.
+
+select("snack"), pay(50)/[50], pay(50)/[100], serve_snack()/["snack"]
+select("snack"), pay(100)/[100], serve_snack()/["snack"]
+select("coffee"), coin(50)/[50], coin(50)/[100], make_coffee("latte")/[], serve_coffee()/["coffee: latte"]

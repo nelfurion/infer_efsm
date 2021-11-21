@@ -1,0 +1,17 @@
+# There is an internal random variable that is being set.
+# If the variable is between 0 and the second input, then the string is echoed.
+# Otherwise it is not.
+
+echo("some string", 30)/[], echo()/["some string"]
+echo("some string", 30)/[], echo()/[""]
+echo("another string", 100)/[], echo()/["another string"]
+echo("string 3", 100)/[], echo()/["string 3"]
+echo("string 4", 0)/[], echo()/[""]
+echo("string 4", 0)/[], echo()/[""]
+echo("string 5", 0)/[], echo()/[""]
+echo("string 5", 100)/[], echo()/["string 5"]
+echo("string 6", 80)/[], echo()/["string 6"]
+echo("string 6", 80)/[], echo()/["string 6"]
+echo("string 6", 80)/[], echo()/["string 6"]
+echo("string 6", 80)/[], echo()/["string 6"]
+echo("string 6", 80)/[], echo()/[""]

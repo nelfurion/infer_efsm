@@ -1,0 +1,17 @@
+{
+  "cSpell.words": [
+    "deap",
+    "EEXIST",
+    "errno",
+    "halloffame",
+    "Koza",
+    "pset",
+    "tournsize"
+  ],
+  "files.exclude": {
+    "**/__pycache__": true
+  },
+  "search.exclude": {
+    "**/__pycache__": true
+  }
+}
