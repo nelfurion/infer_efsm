@@ -26,3 +26,21 @@ def plot_two(x_list, base_f, f2):
   plt.plot(x_list, y2_list, 'r', label='CANDIDATE')
   plt.legend()
   plt.show()
+
+def plot_two_2(x_list, base_f, f2, list_index):
+  y1_list = [base_f(x) for x in x_list]
+  y2_list = [f2(x) for x in x_list]
+
+  xs = list(map(lambda item: item[list_index], x_list))
+
+
+  vals = sorted(list(set(list(map(lambda i: (xs[i], y1_list[i], y2_list[i]), range(len(xs)))))))
+
+  _x = list(map(lambda x: x[0], vals))
+  _y = list(map(lambda x: x[1], vals))
+  _y2 = list(map(lambda x: x[2], vals))
+
+  plt.plot(_x, _y, 'g', label='BASE')
+  plt.plot(_x, _y2, 'r', label='CANDIDATE')
+  plt.legend()
+  plt.show()
