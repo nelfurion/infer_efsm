@@ -1,5 +1,7 @@
 import operator
 
+from deap import algorithms
+
 from custom_operators import protectedDivision, safe_binary_operation
 from plot import plot_tree, plot_two_2
 from traces.trace_parser import TraceParser
@@ -27,7 +29,16 @@ gp_setup = {
   'terminals':[
     [1.0, float]
   ],
-  'target': events['receive']
+  'target': events['receive'],
+  'population_generation_func': lambda population, gpa: algorithms.eaMuCommaLambda(
+    population, 
+    gpa.toolbox, 
+    10, 20, 0.2, 0.1,
+    gpa.generations_count,
+    stats=gpa.mstats,
+    halloffame=gpa.hof,
+    verbose=True
+  )
 }
 
 gpa = GPListInputAlgorithm.create(gp_setup)

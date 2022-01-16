@@ -45,11 +45,17 @@ class GPListInputAlgorithm:
         generations_count=setup['generations_count']
       )
 
+      gpa.setPopulationGenerationFunc(setup['population_generation_func'])
       gpa.addPrimitives(setup['primitives'])
       gpa.addTerminals(setup['terminals'])
       gpa.set_target(setup['target'])
 
+      gpa.addTools()
+
       return gpa
+
+    def setPopulationGenerationFunc(self, population_gen_func):
+        self.population_gen_func = population_gen_func
 
     def addNecessaryPrimitives(self):
       """
@@ -148,10 +154,8 @@ class GPListInputAlgorithm:
         self.mstats.register("max", numpy.max)
 
     def run(self):
-      self.addTools()
       population = self.toolbox.population(n=self.population_size)
-      population, log = algorithms.eaMuCommaLambda(population, self.toolbox, 10, 20, 0.2, 0.1, self.generations_count, stats=self.mstats,
-                                  halloffame=self.hof, verbose=True)
+      population, log = self.population_gen_func(population, self)
 
     def get_best_tree(self):
         return self.hof[0]
