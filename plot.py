@@ -5,6 +5,8 @@ import pygraphviz as pgv
 import math
 import matplotlib.pyplot as plt
 
+from mpl_toolkits import mplot3d
+
 def plot_tree(tree):
   nodes, edges, labels = gp.graph(tree)
 
@@ -44,3 +46,20 @@ def plot_two_2(x_list, base_f, f2, list_index):
   plt.plot(_x, _y2, 'r', label='CANDIDATE')
   plt.legend()
   plt.show()
+
+def plot_3d(xs, ys, zs):
+  fig = plt.figure()
+  ax = plt.axes(projection='3d')
+  # Data for a three-dimensional line
+  zline = zs
+  xline = xs
+  yline = ys
+
+  ax.set_xlabel('x')
+  ax.set_ylabel('y')
+  ax.set_zlabel('z')
+
+  # ax.plot3D([1, 2], [1, 2], [1, 2], 'gray') # line
+  ax.contour3D([[1, 2], [2, 4]], [[1, 2], [1, 2]], [[1,2], [9,10]]) # line
+  plt.show()
+  # ax.scatter(xline, yline, zline, 50, cmap='binary') # contour

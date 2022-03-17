@@ -1,11 +1,15 @@
 {
   "cSpell.words": [
+    "cxpb",
     "deap",
     "EEXIST",
     "errno",
     "halloffame",
     "Koza",
+    "lmbda",
+    "mutpb",
     "pset",
+    "sklearn",
     "tournsize"
   ],
   "files.exclude": {

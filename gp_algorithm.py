@@ -8,7 +8,7 @@ from deap import creator
 from deap import tools
 from deap import gp
 
-from custom_operators import generate_index_combinations, pick_arr_el, protectedDivision, safe_binary_operation, subtract_list_elements, sum_list_elements
+from custom_operators import generate_index_combinations, pick_arr_el, protectedDivision, safe_binary_operation, set_arr_el, subtract_list_elements, sum_list_elements
 from plot import plot_tree, plot_two, plot_two_2
 from traces.trace_parser import TraceParser
 
@@ -69,8 +69,12 @@ class GPListInputAlgorithm:
       """
 
       # Adds the primitive for each separate index of the input list, so that we can choose which argument to use at each step.
-      for i in range(self.list_length):
+      for i in range(self.list_length + 5): # add + 5 for 5 additional registers which are initially set to 0
         self.addPrimitive(pick_arr_el(i), [list], float, 'pick_' + str(i))
+
+      # add ability to set the value of the registers, where the registers are the last 5 elements of the input array
+      for i in range(self.list_length, self.list_length + 5):
+        self.addPrimitive(set_arr_el(i), [list, float], list, 'set_el_' + str(i))
 
       # Identity primitives - the minimal implementation necessary to allow extending trees.
       self.addPrimitive(lambda x: x, [list], list, 'list_list')
@@ -120,23 +124,46 @@ class GPListInputAlgorithm:
         self.toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
         self.toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
-    def eval_mean_squared_error(self, individual):
-        # print('______eval_mean_squared_error')
-        # print(individual)
+    def eval_mean_squared_error(self, individual, x_y_list=None, y_only_list=None):
         # Transform the tree expression in a callable function
-        func = self.toolbox.compile(expr=individual)
+        tree_expression = self.toolbox.compile(expr=individual)
         # Evaluate the mean squared error between the expression
         # and the real function : x**4 + x**3 + x**2 + x
 
         squared_errors = []
-        for x_y in self.target_list:
+        for x_y in (x_y_list or self.target_list):
           # print(func(x_y[0]))
           # print(x_y[1])
           try:
-            # print('TREE INPUTS: ', x_y[0])
-            # print('arg - res: ', x_y[0], ' - ', func(x_y[0]))
-            squared_error = (func(x_y[0]) - x_y[1]) ** 2
+            # EDIT THIS
+            # THIS IS JUST TEST IMPLEMENTATION OF RUNNING A FUNCTION MULTIPLE TIMES WITH A SINGLE PARAMETER
+
+            # this is the coin event in the vending machine
+            # the params for the coin event are from indexes 1 until the end of the array
+            params = x_y[0][1:]
+
+            registers = [0, 0, 0, 0, 0]
+            tree_expression_result = None
+            # lets try to call the tree multiple times with a single parameter each time
+            for param in params:
+
+              # print('calling tree with param: ', param)
+              # print('registers: ', registers)
+              # pass the param in a list, so that we don't have to change the pick_array_element implementation
+              # we will hardcode it to only work for the 0th index of the input, and also for 5 more indexes for 
+              # custom registers.
+              param_and_registers = [param] + registers
+              # print('params list: ', params, ' CALLING WITH: ', param_and_registers)
+              # print('TREE: ', individual)
+              tree_expression_result = tree_expression(param_and_registers)
+              registers = param_and_registers[-5:]
+            # tree_expression_result = tree_expression(x_y[0]) // this is old code
+
+            # only use the last tree expression result from above
+            squared_error = (tree_expression_result - x_y[1]) ** 2
             squared_errors.append(squared_error)
+
+            # print('------------------')
           except TypeError: # if the tree is just: x , then we have array - integer
             print('error')
             pass
@@ -144,6 +171,13 @@ class GPListInputAlgorithm:
 
         return math.fsum(squared_errors) / len(squared_errors) if len(squared_errors) else 20000,
     
+    def score(self, x, y):
+      return self.eval_mean_squared_error(
+        individual=self.get_best_tree(),
+        x_y_list=x
+      )
+
+
     def add_stats(self):
         stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
         stats_size = tools.Statistics(len)

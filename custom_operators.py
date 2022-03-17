@@ -51,3 +51,21 @@ def pick_arr_el(index):
             return 0
 
     return pick
+
+def set_arr_el(index):
+    def set_value(array, value):
+        try:
+            # if value > 1:
+            #     print('SETTING ', index, ' to ', value)
+            #     print('array before: ', array)
+            
+            array[index] = value
+
+            # if value > 1:
+            #     print('array after: ', array)
+
+            return array
+        except:
+            return 0
+
+    return set_value
