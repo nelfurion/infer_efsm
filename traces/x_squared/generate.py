@@ -1,5 +1,5 @@
 import random
-from ..generator import TraceGenerator
+from ..trace_generator import TraceGenerator
 
 tg = TraceGenerator('x_squared')
 tg.generate(

@@ -8,8 +8,10 @@
     "Koza",
     "lmbda",
     "mutpb",
+    "pdiv",
     "pset",
     "sklearn",
+    "termpb",
     "tournsize"
   ],
   "files.exclude": {

@@ -41,31 +41,74 @@ def generate_index_combinations(args_length, combination_length):
     arg_indexes = list(range(args_length))
     return list(itertools.combinations(arg_indexes, combination_length))
 
+# float, bool can be converted to str
+# float, str can be converted to bool
+# but str may not be convertable to float
+# def pick_arr_el(index, output_type):
 def pick_arr_el(index):
     def pick(array):
-        try:
-            res = array[index]
-            res + 1 # if not int throw, e.g. if ''
-            return res
-        except:
-            return 0
+        res = array[index]
+        # return output_type(res)
+        return res
 
     return pick
 
 def set_arr_el(index):
     def set_value(array, value):
-        try:
-            # if value > 1:
-            #     print('SETTING ', index, ' to ', value)
-            #     print('array before: ', array)
-            
-            array[index] = value
+        # if value > 1:
+        #     print('SETTING ', index, ' to ', value)
+        #     print('array before: ', array)
+        
+        array[index] = value
 
-            # if value > 1:
-            #     print('array after: ', array)
+        # if value > 1:
+        #     print('array after: ', array)
 
+        return array
+
+    return set_value
+
+# inputs[-1] is a list that holds indexes of elements to be used as outputs
+def select_element_index_to_use_in_output(output_el_index):
+    def select_output_el_index(array):
+        try: 
+            array[-1].append(output_el_index)
             return array
         except:
             return 0
 
-    return set_value
+    return select_output_el_index
+
+# inputs[-2] is a list that holds indexes of elements to be used as output conditions
+def select_element_index_to_use_as_output_condition(output_cond_el_index):
+    def select(array):
+        try: 
+            array[-2].append(output_cond_el_index)
+            return array
+        except:
+            return 0
+
+    return select
+
+def cycle_conditions_and_outputs(inputs, default_value):
+    # print('cycle_conditions_and_outputs')
+    # print(inputs)
+    conditions = inputs[-2]
+    outputs = inputs[-1]
+
+    # print(conditions, outputs)
+    if len(conditions) == 0 or len(outputs) == 0:
+        return default_value
+    else:
+        for index in range(len(outputs)):
+            if index in range(len(conditions)):
+                condition = inputs[index]
+                if condition:
+                    return outputs[index]
+            # if we have more outputs than conditions and were not able to prove either output
+            else:
+                break
+
+    
+    return default_value
+    

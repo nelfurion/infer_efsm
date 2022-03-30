@@ -13,7 +13,7 @@ def plot_tree(tree):
   g = pgv.AGraph()
   g.add_nodes_from(nodes)
   g.add_edges_from(edges)
-  g.layout(prog="dot")
+  g.layout(prog="neato", args="-Goverlap=scale")
 
   for i in nodes:
       n = g.get_node(i)
