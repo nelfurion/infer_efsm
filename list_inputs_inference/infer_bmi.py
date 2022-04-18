@@ -1,3 +1,4 @@
+from list_inputs_inference.base_estimator import BaseEstimator
 from sklearn.model_selection import GridSearchCV
 
 import operator, math, numbers
@@ -6,17 +7,17 @@ import pandas as pd
 
 from deap import algorithms
 
-from custom_operators import protectedDivision, safe_binary_operation
-from plot import plot_tree, plot_two_2, plot_3d
+from plot import plot_tree
 from traces.trace_parser import TraceParser
 
 from gp_algorithm import GPListInputAlgorithm
 
 
 
-class Estimator:
+class Estimator(BaseEstimator):
   def __init__(self, mu=10, lmbda=20, cxpb=0.8, mutpb=0.2):
     self.set_params(mu, lmbda, cxpb, mutpb)
+    self.inferrence_tree_file_name_prefix = 'infer_bmi_'
 
   def set_params(self, mu, lmbda, cxpb, mutpb):
     self.mu = mu
@@ -84,53 +85,22 @@ class Estimator:
       'mutpb': self.mutpb,
     }
 
-  def fit(self, target_x_y, y):
-    self.setup['target'] = target_x_y
-    self.setup['population_generation_func'] = lambda population, gpa: algorithms.eaMuPlusLambda(
-      population,
-      gpa.toolbox,
-      self.mu,
-      self.lmbda,
-      self.cxpb,
-      self.mutpb,
-      gpa.generations_count,
-      stats=gpa.mstats,
-      halloffame=gpa.hof,
-      verbose=True
-    )
+  # # test_x_y_list is None during training. During training the self.gpa.target_list is used.
+  # # When testing the score of the already trained tree - test_x_y_list is used.
+  # # We split the data into training and testing sets.
+  # def mean_squared_error_bmi(self, individual, test_x_y_list = None, y_only_list = None):
+  #   tree_expression = self.gpa.toolbox.compile(expr=individual)
+  #   squared_errors = []
 
-    self.gpa = GPListInputAlgorithm.create(self.setup)
-    self.gpa.run()
-    self.estimator = self.gpa.get_best_tree()
-    plot_tree(self.estimator, "./results/infer_bmi_" + str(self.get_params()))
+  #   for x, y in (test_x_y_list or self.gpa.target_list):
+  #     params = x[0:-1] # here particularly the last param is an empty string which we shouldn't use
+  #     registers = [0, 0, 0, 0, 0]
+  #     res = tree_expression(params + registers)
+  #     squared_error = (res - float(y)) ** 2
 
-    return self
-
-  def get_best_tree(self):
-    return self.estimator
-
-  def get_tree_expression(self):
-    return self.gpa.get_best_tree_expression()
-
-  def score(self, x, y):
-    return self.gpa.score(x, y)[0]
-
-  # test_x_y_list is None during training. During training the self.gpa.target_list is used.
-  # When testing the score of the already trained tree - test_x_y_list is used.
-  # We split the data into training and testing sets.
-  def mean_squared_error_bmi(self, individual, test_x_y_list = None, y_only_list = None):
-    tree_expression = self.gpa.toolbox.compile(expr=individual)
-    squared_errors = []
-
-    for x, y in (test_x_y_list or self.gpa.target_list):
-      params = x[0:-1] # here particularly the last param is an empty string which we shouldn't use
-      registers = [0, 0, 0, 0, 0]
-      res = tree_expression(params + registers)
-      squared_error = (res - float(y)) ** 2
-
-      squared_errors.append(squared_error)
+  #     squared_errors.append(squared_error)
     
-    return math.fsum(squared_errors) / len(squared_errors),
+  #   return math.fsum(squared_errors) / len(squared_errors),
 
   # Fitness objective is to minimize the number of errors
   def score_same_classes(self, individual, test_x_y_list = None, y_only_list = None):

@@ -1,3 +1,4 @@
+from list_inputs_inference.base_estimator import BaseEstimator
 from sklearn.model_selection import GridSearchCV
 
 import operator
@@ -15,14 +16,10 @@ from traces.trace_parser import TraceParser
 
 from gp_algorithm import GPListInputAlgorithm
 
-def generate_random_string(length = 3):
-  letters = [string.ascii_lowercase[random.randint(0, 25)] for i in range(0, length)]
-  
-  return ''.join(letters)
-
-class Estimator:
+class Estimator(BaseEstimator):
   def __init__(self, mu=10, lmbda=20, cxpb=0.2, mutpb=0.1, gcount=50):
     self.set_params(mu, lmbda, cxpb, mutpb, gcount)
+    self.inferrence_tree_file_name_prefix = 'infer_vending_machine_'
 
   def set_params(self, mu, lmbda, cxpb, mutpb, gcount):
     self.mu = mu
@@ -62,45 +59,6 @@ class Estimator:
       'mutpb': self.mutpb,
       'gcount': self.gcount
     }
-
-  def fit(self, target_x_y, y):
-    self.setup['target'] = target_x_y
-    self.setup['population_generation_func'] = lambda population, gpa: algorithms.eaMuPlusLambda(
-      population,
-      gpa.toolbox,
-      self.mu,
-      self.lmbda,
-      self.cxpb,
-      self.mutpb,
-      gpa.generations_count,
-      stats=gpa.mstats,
-      halloffame=gpa.hof,
-      verbose=True
-    )
-
-    self.gpa = GPListInputAlgorithm.create(self.setup)
-    self.gpa.run()
-    self.estimator = self.gpa.get_best_tree()
-    # print("************************")
-    # print("************************")
-    # print("************************")
-    # try:
-    #   print("scpre: >", self.gpa.score(target_x_y, y)[0], "<")
-    # except Exception as e:
-    #   print(e)
-    # print("************************")
-    plot_tree(self.estimator, "./results/infer_vending_machine_" + str(self.gpa.score(target_x_y, y)[0]) + "--" + str(self.get_params()) + generate_random_string(10))
-
-    return self
-
-  def get_best_tree(self):
-    return self.estimator
-
-  def get_tree_expression(self):
-    return self.gpa.get_best_tree_expression()
-
-  def score(self, x, y):
-    return -1 * self.gpa.score(x, y)[0]
 
   def eval_mean_squared_error(self, individual, test_x_y_list=None, y_only_list=None):
         # Transform the tree expression in a callable function

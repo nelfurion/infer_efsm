@@ -1,7 +1,6 @@
 import operator
 
-import math, numpy
-import typing
+import numpy
 
 from deap import algorithms
 from deap import base
@@ -9,9 +8,7 @@ from deap import creator
 from deap import tools
 from deap import gp
 
-from custom_operators import cycle_conditions_and_outputs, select_element_index_to_use_in_output, select_element_index_to_use_as_output_condition, generate_index_combinations, pick_arr_el, protectedDivision, safe_binary_operation, set_arr_el, subtract_list_elements, sum_list_elements
-from plot import plot_tree, plot_two, plot_two_2
-from traces.trace_parser import TraceParser
+from custom_operators import pick_arr_el, set_arr_el
 
 REGISTERS_COUNT = 5
 
@@ -87,8 +84,6 @@ class GPListInputAlgorithm:
       """
 
       self.addDataStoreAndRetrievePrimitives()
-      # self.addSelectOutputElementPrimitives()
-      # self.addSelectOutputConditionPrimitives()
 
       # Identity primitives - the minimal implementation necessary to allow extending trees.
       self.addPrimitive(lambda x: x, [list], list, 'list_list')
@@ -114,16 +109,6 @@ class GPListInputAlgorithm:
         self.addPrimitive(set_arr_el(i), [list, object], list, 'set_' + str(i))
         # self.addPrimitive(set_arr_el(i), [list, bool], list, 'set_bool_' + str(i))
         # self.addPrimitive(set_arr_el(i), [list, str], list, 'set_str_' + str(i))
-
-      # self.addPrimitive(cycle_conditions_and_outputs, [list, self.output_type], self.output_type, 'loop_conditions_outputs')
-
-    # def addSelectOutputElementPrimitives(self):
-    #   for i in range(self.list_length, self.list_length + REGISTERS_COUNT - 2):
-    #     self.addPrimitive(select_element_index_to_use_in_output(i), [list], list, 'select_el_for_output_' + str(i))
-
-    # def addSelectOutputConditionPrimitives(self):
-    #   for i in range(self.list_length, self.list_length + REGISTERS_COUNT - 2):
-    #     self.addPrimitive(select_element_index_to_use_as_output_condition(i), [list], list, 'select_el_for_output_condition_' + str(i))
 
     def addPrimitive(self, operator, input_types, output_type, name):
         self.pset.addPrimitive(operator, input_types, output_type, name)
@@ -171,73 +156,11 @@ class GPListInputAlgorithm:
         self.toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
         self.toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
-    def eval_mean_squared_error(self, individual, test_x_y_list=None, y_only_list=None):
-        # Transform the tree expression in a callable function
-        tree_expression = self.toolbox.compile(expr=individual)
-        # Evaluate the mean squared error between the expression
-        # and the real function : x**4 + x**3 + x**2 + x
-
-        # print('x_y_list: ', x_y_list)
-        # print('self.target_list: ', self.target_list)
-
-        squared_errors = []
-        for x_y in (test_x_y_list or self.target_list):
-          # print(func(x_y[0]))
-          # print(x_y[1])
-          try:
-            # EDIT THIS
-            # THIS IS JUST TEST IMPLEMENTATION OF RUNNING A FUNCTION MULTIPLE TIMES WITH A SINGLE PARAMETER
-
-            # this is the coin event in the vending machine
-            # the params for the coin event are from indexes 1 until the end of the array
-            # FIX THIS PART
-            params = x_y[0][1:]
-            # print('params: ', params)
-
-            registers = [0, 0, 0, 0, 0]
-            output_condition_elements = []
-            output_elements = []
-
-            tree_expression_result = None
-            # lets try to call the tree multiple times with a single parameter each time
-            for param in params:
-
-              # print('calling tree with param: ', param)
-              # print('registers: ', registers)
-              # pass the param in a list, so that we don't have to change the pick_array_element implementation
-              # we will hardcode it to only work for the 0th index of the input, and also for 5 more indexes for 
-              # custom registers.
-              param_and_registers = [param] + registers + [output_condition_elements, output_elements]
-              # print('params list: ', params, ' CALLING WITH: ', param_and_registers)
-              # print('TREE: ', individual)
-              tree_expression_result = tree_expression(param_and_registers)
-              registers = param_and_registers[-5:]
-            # tree_expression_result = tree_expression(x_y[0]) // this is old code
-
-            # only use the last tree expression result from above
-            squared_error = (tree_expression_result - x_y[1]) ** 2
-            squared_errors.append(squared_error)
-
-            # print('------------------')
-          except TypeError as e: # if the tree is just: x , then we have array - integer
-            print(e)
-            print(individual)
-            pass
-        # squared_errors = () for x_y in self.target_list)
-
-        return math.fsum(squared_errors) / len(squared_errors) if len(squared_errors) else 20000,
-    
     def score(self, x, y):
       return self.individual_fitness_eval_func(
         individual=self.get_best_tree(),
         test_x_y_list=x
       )
-
-      # return self.best_tree_score
-      # return self.eval_mean_squared_error(
-      #   individual=self.get_best_tree(),
-      #   x_y_list=x
-      # )
 
 
     def add_stats(self):
