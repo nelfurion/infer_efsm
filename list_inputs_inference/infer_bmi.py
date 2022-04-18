@@ -25,27 +25,28 @@ class Estimator:
     self.mutpb = mutpb
 
     self.setup = {
-      'population_size': 1000,
+      'population_size': 10000,
       'hall_of_fame_size': 2,
       'input_list_length': 1, # hardcoding it to only accept a single argument # event_args_length,
       'output_type': str,
-      'generations_count': 10000,
+      'generations_count': 100,
       'primitives': [
         # [operator.add, [float, float], float, 'add'],
         # [operator.sub, [float, float], float, 'sub'],
-        [operator.mul, [numbers.Complex, numbers.Complex], float, 'mul'],
-        [operator.truediv, [numbers.Complex, numbers.Complex], float, 'div'],
+        # [operator.mul, [numbers.Complex, numbers.Complex], float, 'mul'],
+        # [operator.truediv, [numbers.Complex, numbers.Complex], float, 'div'],
         # [safe_binary_operation(operator.mod, -1), [float, float], float, 'mod'],
         # [operator.ge, [float, float], bool, 'ge'],
-        # [operator.gt, [float, float], bool, 'gt'],
+        [operator.gt, [numbers.Complex, numbers.Complex], bool, 'gt'],
         # [operator.le, [float, float], bool, 'le'],
         [operator.lt, [numbers.Complex, numbers.Complex], bool, 'lt'],
         
         # [operator.eq, [float, float], bool, 'eq'],
         # [operator.not_, [bool], bool, 'my_not'],
-        [lambda bool_1, bool_2: bool_1 and bool_2, [bool, bool], bool, 'my_and'],
+        # [lambda bool_1, bool_2: bool_1 and bool_2, [bool, bool], bool, 'my_and'],
         # [lambda bool_1, bool_2: bool_1 or bool_2, [bool, bool], bool, 'my_or'],
         # [lambda bool_1, bool_2: bool_1 != bool_2, [bool, bool], bool, 'my_xor'],
+        [lambda bool, str_1, str_2: str_1 if bool else str_2 , [bool, str, str], str, 'if_else'],
         # [lambda string_1, string_2, boolean: string_1 if boolean else string_2, [str, str, bool], str, 'str_on_b'],
         # [lambda is_even: 'yes' if is_even else 'no', [bool], str, 'is_even'],
         # [lambda is_overweight: 'overweight' if is_overweight else 'healthy', [bool], str, 'is_overweight'],
@@ -57,8 +58,10 @@ class Estimator:
         # [0, float],
         # [1, float],
         # [2, float],
-        [10000, float],
-        # [100, float],
+        # [10000, float],
+        [100, float],
+        [18.5, float],
+        [24.9, float],
         [True, bool],
         [False, bool],
         ['healthy', str],
@@ -99,6 +102,7 @@ class Estimator:
     self.gpa = GPListInputAlgorithm.create(self.setup)
     self.gpa.run()
     self.estimator = self.gpa.get_best_tree()
+    plot_tree(self.estimator, "./results/infer_bmi_" + str(self.get_params()))
 
     return self
 
@@ -140,7 +144,7 @@ class Estimator:
       output_elements = []
 
       # [1, 2, 0, 0, 0, 0, 0, [], []]
-      all_inputs = x + registers + [output_condition_elements, output_elements]
+      all_inputs = x + registers # + [output_condition_elements, output_elements]
       try:
         res = tree_expression(all_inputs)
         if (res != y):
@@ -148,7 +152,17 @@ class Estimator:
       except (TypeError, ValueError, ZeroDivisionError) as e:
         return 100000,
 
-    return len(squared_errors),
+
+    # if_discount = min(str(individual).count('if_else') * 10, 10)
+
+    # gt_discount = min(str(individual).count('gt') * 10, 10)
+    # lt_discount = min(str(individual).count('lt') * 10, 10)
+    # num_1_discount = min(str(individual).count('18.5') * 10, 10)
+    # num_2_discount = min(str(individual).count('24.9') * 10, 10)
+    # pick_1_discount = min(str(individual).count('pick_float_0') * 10, 10)
+    # pick_2_discount = min(str(individual).count('pick_float_1') * 10, 10)
+
+    return len(squared_errors),# - if_discount - gt_discount - lt_discount - num_1_discount - num_2_discount - pick_1_discount - pick_2_discount,
     
 
 
@@ -158,42 +172,42 @@ event_args_length, events = tp.parse()
 
 # print(events['bmi'])
 
-train_set = events['bmi'][:4700]
-test_set = events['bmi'][4700:]
+# train_set = events['bmi'][:4700]
+# test_set = events['bmi'][4700:]
 
 
-gpa_estimator = Estimator()
-gpa_estimator.fit(train_set, train_set)
+# gpa_estimator = Estimator()
+# gpa_estimator.fit(train_set, train_set)
 
 
-print('**************************')
+# print('**************************')
 
-best_tree_score = gpa_estimator.score(test_set, test_set)
-print("Best Tree Syntax: ", str(gpa_estimator.get_best_tree()))
-print("Best Tree Score on test set: ", best_tree_score)
-plot_tree(gpa_estimator.get_best_tree())
-print('HOF 2nd best')
-print(gpa_estimator.gpa.hof[1])
+# best_tree_score = gpa_estimator.score(test_set, test_set)
+# print("Best Tree Syntax: ", str(gpa_estimator.get_best_tree()))
+# print("Best Tree Score on test set: ", best_tree_score)
+# plot_tree(gpa_estimator.get_best_tree())
+# print('HOF 2nd best')
+# print(gpa_estimator.gpa.hof[1])
 
-best_tree_exp = gpa_estimator.get_tree_expression()
-print('best tree outputs 0:10')
-for x, y in test_set[0:10]:
-  print(x, best_tree_exp(x + [None, None, None, None, None, [], []]))
+# best_tree_exp = gpa_estimator.get_tree_expression()
+# print('best tree outputs 0:10')
+# for x, y in test_set[0:10]:
+#   print(x, best_tree_exp(x + [None, None, None, None, None, [], []]))
 
 
 
-# x_y_list = events['is_even']
+x_y_list = events['bmi']
 
-# grid_search_tree = GridSearchCV(
-#   estimator=Estimator(), 
-#   param_grid={
-#     'mu': [5, 10],
-#     'lmbda': [10, 20],
-#     'cxpb': [0.1, 0.2],
-#     'mutpb': [0.1, 0.2],
-#   }
-# )
+grid_search_tree = GridSearchCV(
+  estimator=Estimator(), 
+  param_grid={
+    'mu': [5, 10],
+    'lmbda': [10], #[10, 20],
+    'cxpb': [0.1], #[0.1, 0.2],
+    'mutpb': [0.1], # [0.1, 0.2],
+  }
+)
 
-# grid_search_tree.fit(x_y_list, x_y_list)
-# dataframe = pd.DataFrame(grid_search_tree.cv_results_)
-# dataframe.to_csv('result.csv')
+grid_search_tree.fit(x_y_list, x_y_list)
+dataframe = pd.DataFrame(grid_search_tree.cv_results_)
+dataframe.to_csv('result.csv')

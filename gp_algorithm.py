@@ -87,8 +87,8 @@ class GPListInputAlgorithm:
       """
 
       self.addDataStoreAndRetrievePrimitives()
-      self.addSelectOutputElementPrimitives()
-      self.addSelectOutputConditionPrimitives()
+      # self.addSelectOutputElementPrimitives()
+      # self.addSelectOutputConditionPrimitives()
 
       # Identity primitives - the minimal implementation necessary to allow extending trees.
       self.addPrimitive(lambda x: x, [list], list, 'list_list')
@@ -101,8 +101,8 @@ class GPListInputAlgorithm:
       # Adds the primitive for each separate index of the input list, so that we can choose which argument to use at each step.
       # pick_3(x) means take the x input which is the array of [input1_, input_2, ..., reg_1, reg_2, ...] and take the 3rd element
       # The 3rd element can either be an input value or a register value.
-      for i in range(self.list_length + REGISTERS_COUNT - 2): # add + 5 for 5 additional registers which are initially set to 0
-        self.addPrimitive(pick_arr_el(i), [list], object, 'pick_' + str(i))
+      for i in range(self.list_length + REGISTERS_COUNT): # add + 5 for 5 additional registers which are initially set to 0
+        self.addPrimitive(pick_arr_el(i, float), [list], float, 'pick_float_' + str(i))
         # self.addPrimitive(pick_arr_el(i, bool), [list], bool, 'pick_bool_' + str(i))
         # self.addPrimitive(pick_arr_el(i, str), [list], str, 'pick_str_' + str(i))
 
@@ -110,20 +110,20 @@ class GPListInputAlgorithm:
       # set_el_5(x, 2) - means set the 5th element(starting from 0) in the input array to 2
       # It can only set values of registers. - for [input_1, input_2, reg_1, reg_2], the only possible
       # operators are set_el_2 and set_el_3.
-      for i in range(self.list_length, self.list_length + REGISTERS_COUNT - 2):
+      for i in range(self.list_length, self.list_length + REGISTERS_COUNT):
         self.addPrimitive(set_arr_el(i), [list, object], list, 'set_' + str(i))
         # self.addPrimitive(set_arr_el(i), [list, bool], list, 'set_bool_' + str(i))
         # self.addPrimitive(set_arr_el(i), [list, str], list, 'set_str_' + str(i))
 
-      self.addPrimitive(cycle_conditions_and_outputs, [list, self.output_type], self.output_type, 'loop_conditions_outputs')
+      # self.addPrimitive(cycle_conditions_and_outputs, [list, self.output_type], self.output_type, 'loop_conditions_outputs')
 
-    def addSelectOutputElementPrimitives(self):
-      for i in range(self.list_length, self.list_length + REGISTERS_COUNT - 2):
-        self.addPrimitive(select_element_index_to_use_in_output(i), [list], list, 'select_el_for_output_' + str(i))
+    # def addSelectOutputElementPrimitives(self):
+    #   for i in range(self.list_length, self.list_length + REGISTERS_COUNT - 2):
+    #     self.addPrimitive(select_element_index_to_use_in_output(i), [list], list, 'select_el_for_output_' + str(i))
 
-    def addSelectOutputConditionPrimitives(self):
-      for i in range(self.list_length, self.list_length + REGISTERS_COUNT - 2):
-        self.addPrimitive(select_element_index_to_use_as_output_condition(i), [list], list, 'select_el_for_output_condition_' + str(i))
+    # def addSelectOutputConditionPrimitives(self):
+    #   for i in range(self.list_length, self.list_length + REGISTERS_COUNT - 2):
+    #     self.addPrimitive(select_element_index_to_use_as_output_condition(i), [list], list, 'select_el_for_output_condition_' + str(i))
 
     def addPrimitive(self, operator, input_types, output_type, name):
         self.pset.addPrimitive(operator, input_types, output_type, name)
@@ -232,6 +232,8 @@ class GPListInputAlgorithm:
         individual=self.get_best_tree(),
         test_x_y_list=x
       )
+
+      # return self.best_tree_score
       # return self.eval_mean_squared_error(
       #   individual=self.get_best_tree(),
       #   x_y_list=x

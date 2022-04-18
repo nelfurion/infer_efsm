@@ -44,12 +44,14 @@ def generate_index_combinations(args_length, combination_length):
 # float, bool can be converted to str
 # float, str can be converted to bool
 # but str may not be convertable to float
-# def pick_arr_el(index, output_type):
-def pick_arr_el(index):
+def pick_arr_el(index, output_type):
+# def pick_arr_el(index):
     def pick(array):
         res = array[index]
-        # return output_type(res)
-        return res
+
+        # print('pick_ ', index, ': ', res, ' as ', str(output_type), '      ARR: ', str(array))
+        return output_type(res)
+        # return res
 
     return pick
 
@@ -59,6 +61,7 @@ def set_arr_el(index):
         #     print('SETTING ', index, ' to ', value)
         #     print('array before: ', array)
         
+        # print('set_ ', index, ': ', str(value), '      ARR: ', str(array))
         array[index] = value
 
         # if value > 1:

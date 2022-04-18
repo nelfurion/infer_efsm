@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from mpl_toolkits import mplot3d
 
-def plot_tree(tree):
+def plot_tree(tree, filename):
   nodes, edges, labels = gp.graph(tree)
 
   g = pgv.AGraph()
@@ -19,7 +19,7 @@ def plot_tree(tree):
       n = g.get_node(i)
       n.attr["label"] = labels[i]
 
-  g.draw("tree.pdf")
+  g.draw(filename + ".pdf")
 
 def plot_two(x_list, base_f, f2):
   y1_list = [base_f(x) for x in x_list]
