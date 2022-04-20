@@ -25,7 +25,7 @@ REGISTERS_COUNT = 5
 #   possible outputs to that function we may need an if-elseif-elseif-elseif-then operator and so on.
 
 class GPListInputAlgorithm:
-    def __init__(self, population_size, hof_size, input_types, output_type, list_length, generations_count, individual_fitness_eval_func, cx_tool, selection, tournsize=None, tournparssize=None) -> None:
+    def __init__(self, population_size, hof_size, input_types, output_type, list_length, generations_count, individual_fitness_eval_func, mut_tool, cx_tool, selection, tournsize=None, tournparssize=None) -> None:
         self.pset = gp.PrimitiveSetTyped("MAIN", input_types, output_type)
         self.output_type = output_type
         self.toolbox = base.Toolbox()
@@ -37,6 +37,7 @@ class GPListInputAlgorithm:
 
         self.individual_fitness_eval_func = individual_fitness_eval_func
 
+        self.mut_tool = mut_tool
         self.cx_tool = cx_tool
         self.selection = selection
         self.tournsize = tournsize
@@ -54,6 +55,9 @@ class GPListInputAlgorithm:
         self.addIndividual(gp.PrimitiveTree)
         self.addNecessaryPrimitives()
 
+        # for when selecting semantic mucation or semantic crossover both of which require the addition of the lf function
+        self.lf_func_added = False
+
     @staticmethod
     def create(setup):
       gpa =  GPListInputAlgorithm(
@@ -64,6 +68,7 @@ class GPListInputAlgorithm:
         list_length=setup['input_list_length'],
         generations_count=setup['generations_count'],
         individual_fitness_eval_func=setup['individual_fitness_eval_func'] if 'individual_fitness_eval_func' in setup.keys() else None,
+        mut_tool=setup['mut_tool'],
         cx_tool=setup['cx_tool'],
         selection=setup['selection'],
         tournsize=setup['tournsize'],
@@ -153,13 +158,13 @@ class GPListInputAlgorithm:
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
         self.toolbox.register("compile", gp.compile, pset=self.pset)
 
-        self.toolbox.register("evaluate", self.individual_fitness_eval_func or self.eval_mean_squared_error)
+        self.toolbox.register("evaluate", self.individual_fitness_eval_func)
         self.addSelectionTool()
         self.addCrossOverTool()
-        
-        # self.toolbox.register("expr_mut", gp.genHalfAndHalf, min_=0, max_=10)
-        self.toolbox.register("expr_mut", gp.genHalfAndHalf, min_=0, max_=2)
-        self.toolbox.register("mutate", gp.mutUniform, expr=self.toolbox.expr_mut, pset=self.pset)
+        self.addMutationTool()
+
+        # required for either semantic mutation or for semantic crossover
+        self._addCxSemanticLFFunc()
 
         # Then, we decorate the mate and mutate method to limit the height of generated individuals. 
         # This is done to avoid an important draw back of genetic programming : bloat. 
@@ -167,12 +172,25 @@ class GPListInputAlgorithm:
         self.toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
         self.toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
+    def addMutationTool(self):
+      self.toolbox.register("expr_mut", gp.genHalfAndHalf, min_=0, max_=6)
+
+      if self.mut_tool == 'mutShrink':
+        self.toolbox.register("mutate", gp.mutShrink)
+      elif self.mut_tool == 'mutUniform':
+        self.toolbox.register("mutate", gp.mutUniform, expr=self.toolbox.expr_mut, pset=self.pset)
+      elif self.mut_tool == 'mutNodeReplacement':
+        self.toolbox.register("mutate", gp.mutNodeReplacement, pset=self.pset)
+      elif self.mut_tool == 'mutInsert':
+        self.toolbox.register("mutate", gp.mutInsert, pset=self.pset)
+      elif self.mut_tool == 'mutSemantic':
+        self.toolbox.register("mutate", gp.mutSemantic, gen_func=gp.genHalfAndHalf, pset=self.pset, min=2, max=6, ms=None)
+
     def _addCxSemanticLFFunc(self):
-      def lf(x): 
-        return 1 / (1 + math.exp(-x))
+        def lf(x): 
+          return 1 / (1 + math.exp(-x))
 
-      self.pset.addPrimitive(lf, [float], float, name="lf")
-
+        self.pset.addPrimitive(lf, [float], float, name="lf")
 
     def addCrossOverTool(self):
       if self.cx_tool == 'cxOnePointLeafBiased':
@@ -180,7 +198,6 @@ class GPListInputAlgorithm:
       elif self.cx_tool == 'cxOnePoint':
         self.toolbox.register("mate", gp.cxOnePoint)
       elif self.cx_tool == 'cxSemantic':
-        self._addCxSemanticLFFunc()
         self.toolbox.register("mate", gp.cxSemantic, gen_func=gp.genHalfAndHalf, pset=self.pset, min=2, max=6)
 
     def addSelectionTool(self):

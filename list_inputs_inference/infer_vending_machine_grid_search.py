@@ -17,10 +17,10 @@ from traces.trace_parser import TraceParser
 global treedir
 
 class Estimator(BaseEstimator):
-  def __init__(self, mu=10, lmbda=20, cxpb=0.2, mutpb=0.1, gcount=50, popsize=300, cx_tool='cxOnePoint', selection='tournament', tree_output_dir='', tournsize=None, tournparssize=None):
-    self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, cx_tool, selection, tree_output_dir, tournsize, tournparssize)
+  def __init__(self, mu=None, lmbda=None, cxpb=None, mutpb=None, gcount=None, popsize=None, mut_tool=None, cx_tool=None, selection=None, tree_output_dir=None, tournsize=None, tournparssize=None):
+    self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize, tournparssize)
 
-  def set_params(self, mu, lmbda, cxpb, mutpb, gcount, popsize, cx_tool, selection, tree_output_dir, tournsize=None, tournparssize=None):
+  def set_params(self, mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize=None, tournparssize=None):
     self.tree_output_dir = tree_output_dir
     self.mu = mu
     self.lmbda = lmbda
@@ -28,8 +28,10 @@ class Estimator(BaseEstimator):
     self.mutpb = mutpb
     self.gcount = gcount
     self.popsize = popsize
-    self.tournsize = tournsize
+    self.mut_tool = mut_tool
+    self.cx_tool = cx_tool
     self.selection = selection
+    self.tournsize = tournsize
     self.tournparssize = tournparssize
 
     self.setup = {
@@ -53,6 +55,7 @@ class Estimator(BaseEstimator):
         [0, float]
       ],
       'individual_fitness_eval_func': self.eval_mean_squared_error,
+      'mut_tool': mut_tool,
       'cx_tool': cx_tool,
       'selection': selection,
       'tournsize': tournsize,
@@ -72,14 +75,12 @@ class Estimator(BaseEstimator):
       'mutpb': self.mutpb,
       'gcount': self.gcount,
       'popsize': self.popsize,
+      'mut_tool': self.mut_tool,
+      'cx_tool': self.cx_tool,
       'selection': self.selection,
+      'tournsize': self.tournsize,
+      'tournparssize': self.tournparssize
     }
-
-    if self.tournsize:
-      params['tournsize'] = self.tournsize
-
-    if self.tournparssize:
-      params['tournparssize'] = self.tournparssize
 
     return params
 
