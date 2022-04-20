@@ -24,7 +24,7 @@ REGISTERS_COUNT = 5
 #   possible outputs to that function we may need an if-elseif-elseif-elseif-then operator and so on.
 
 class GPListInputAlgorithm:
-    def __init__(self, population_size, hof_size, input_types, output_type, list_length, generations_count, individual_fitness_eval_func = None) -> None:
+    def __init__(self, population_size, hof_size, input_types, output_type, list_length, generations_count, individual_fitness_eval_func, selection, tournsize=None, tournparssize=None) -> None:
         self.pset = gp.PrimitiveSetTyped("MAIN", input_types, output_type)
         self.output_type = output_type
         self.toolbox = base.Toolbox()
@@ -35,6 +35,10 @@ class GPListInputAlgorithm:
         self.generations_count = generations_count
 
         self.individual_fitness_eval_func = individual_fitness_eval_func
+
+        self.selection = selection
+        self.tournsize = tournsize
+        self.tournparssize = tournparssize
 
         self.pset.renameArguments(ARG0="x")
         self.pset.renameArguments(ARG1="y")
@@ -57,7 +61,10 @@ class GPListInputAlgorithm:
         output_type=setup['output_type'],
         list_length=setup['input_list_length'],
         generations_count=setup['generations_count'],
-        individual_fitness_eval_func=setup['individual_fitness_eval_func'] if 'individual_fitness_eval_func' in setup.keys() else None
+        individual_fitness_eval_func=setup['individual_fitness_eval_func'] if 'individual_fitness_eval_func' in setup.keys() else None,
+        selection=setup['selection'],
+        tournsize=setup['tournsize'],
+        tournparssize=setup['tournparssize']
       )
 
       gpa.setPopulationGenerationFunc(setup['population_generation_func'])
@@ -144,7 +151,13 @@ class GPListInputAlgorithm:
         self.toolbox.register("compile", gp.compile, pset=self.pset)
 
         self.toolbox.register("evaluate", self.individual_fitness_eval_func or self.eval_mean_squared_error)
-        self.toolbox.register("select", tools.selTournament, tournsize=10)
+        if self.selection == 'tourn':
+          self.toolbox.register("select", tools.selTournament, tournsize=self.tournsize)
+        # elif self.selection == 'tourn_dcd':
+        #   self.toolbox.register("select", tools.selTournamentDCD)
+        elif self.selection == 'tourn_double':
+          self.toolbox.register("select", tools.selDoubleTournament, fitness_size=self.tournsize, parsimony_size=self.tournparssize, fitness_first=True)
+
         self.toolbox.register("mate", gp.cxOnePointLeafBiased, termpb=0.1)
         # self.toolbox.register("expr_mut", gp.genHalfAndHalf, min_=0, max_=10)
         self.toolbox.register("expr_mut", gp.genHalfAndHalf, min_=0, max_=2)

@@ -24,7 +24,7 @@ class BaseEstimator():
     self.gpa.run()
     self.estimator = self.gpa.get_best_tree()
     try:
-      plot_tree(self.estimator, "./results/" + self.inferrence_tree_file_name_prefix + str(self.gpa.score(target_x_y, y)[0]) + "--" + str(self.get_params()) + generate_random_string(10))
+      plot_tree(self.estimator, self.inferrence_tree_file_name_prefix + str(self.gpa.score(target_x_y, y)[0]) + "--" + str(self.get_params()) + generate_random_string(10))
     except Exception as e:
       print(e)
 
