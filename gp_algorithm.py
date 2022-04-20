@@ -1,6 +1,7 @@
 import operator
 
 import numpy
+import math
 
 from deap import algorithms
 from deap import base
@@ -24,7 +25,7 @@ REGISTERS_COUNT = 5
 #   possible outputs to that function we may need an if-elseif-elseif-elseif-then operator and so on.
 
 class GPListInputAlgorithm:
-    def __init__(self, population_size, hof_size, input_types, output_type, list_length, generations_count, individual_fitness_eval_func, selection, tournsize=None, tournparssize=None) -> None:
+    def __init__(self, population_size, hof_size, input_types, output_type, list_length, generations_count, individual_fitness_eval_func, cx_tool, selection, tournsize=None, tournparssize=None) -> None:
         self.pset = gp.PrimitiveSetTyped("MAIN", input_types, output_type)
         self.output_type = output_type
         self.toolbox = base.Toolbox()
@@ -36,6 +37,7 @@ class GPListInputAlgorithm:
 
         self.individual_fitness_eval_func = individual_fitness_eval_func
 
+        self.cx_tool = cx_tool
         self.selection = selection
         self.tournsize = tournsize
         self.tournparssize = tournparssize
@@ -62,6 +64,7 @@ class GPListInputAlgorithm:
         list_length=setup['input_list_length'],
         generations_count=setup['generations_count'],
         individual_fitness_eval_func=setup['individual_fitness_eval_func'] if 'individual_fitness_eval_func' in setup.keys() else None,
+        cx_tool=setup['cx_tool'],
         selection=setup['selection'],
         tournsize=setup['tournsize'],
         tournparssize=setup['tournparssize']
@@ -152,8 +155,8 @@ class GPListInputAlgorithm:
 
         self.toolbox.register("evaluate", self.individual_fitness_eval_func or self.eval_mean_squared_error)
         self.addSelectionTool()
-
-        self.toolbox.register("mate", gp.cxOnePointLeafBiased, termpb=0.1)
+        self.addCrossOverTool()
+        
         # self.toolbox.register("expr_mut", gp.genHalfAndHalf, min_=0, max_=10)
         self.toolbox.register("expr_mut", gp.genHalfAndHalf, min_=0, max_=2)
         self.toolbox.register("mutate", gp.mutUniform, expr=self.toolbox.expr_mut, pset=self.pset)
@@ -164,18 +167,28 @@ class GPListInputAlgorithm:
         self.toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
         self.toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
 
+    def _addCxSemanticLFFunc(self):
+      def lf(x): 
+        return 1 / (1 + math.exp(-x))
+
+      self.pset.addPrimitive(lf, [float], float, name="lf")
+
+
+    def addCrossOverTool(self):
+      if self.cx_tool == 'cxOnePointLeafBiased':
+        self.toolbox.register("mate", gp.cxOnePointLeafBiased, termpb=0.1)
+      elif self.cx_tool == 'cxOnePoint':
+        self.toolbox.register("mate", gp.cxOnePoint)
+      elif self.cx_tool == 'cxSemantic':
+        self._addCxSemanticLFFunc()
+        self.toolbox.register("mate", gp.cxSemantic, gen_func=gp.genHalfAndHalf, pset=self.pset, min=2, max=6)
+
     def addSelectionTool(self):
       if self.selection == 'sel_tourn':
         self.toolbox.register("select", tools.selTournament, tournsize=self.tournsize)
       # elif self.selection == 'sel_tourn_dcd':
       #   self.toolbox.register("select", tools.selTournamentDCD)
       elif self.selection == 'sel_tourn_double':
-        import sys
-        print('*****************************', file=sys.stderr)
-        print('*****************************', file=sys.stderr)
-        print(str(self.tournparssize), file=sys.stderr)
-        print('*****************************', file=sys.stderr)
-        print('*****************************', file=sys.stderr)
         self.toolbox.register("select", tools.selDoubleTournament, fitness_size=self.tournsize, parsimony_size=self.tournparssize, fitness_first=True)
       elif self.selection == 'sel_random':
         self.toolbox.register("select", tools.selRandom)

@@ -17,10 +17,10 @@ from traces.trace_parser import TraceParser
 global treedir
 
 class Estimator(BaseEstimator):
-  def __init__(self, mu=10, lmbda=20, cxpb=0.2, mutpb=0.1, gcount=50, popsize=300, selection='tournament', tree_output_dir='', tournsize=None, tournparssize=None):
-    self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, selection, tree_output_dir, tournsize, tournparssize)
+  def __init__(self, mu=10, lmbda=20, cxpb=0.2, mutpb=0.1, gcount=50, popsize=300, cx_tool='cxOnePoint', selection='tournament', tree_output_dir='', tournsize=None, tournparssize=None):
+    self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, cx_tool, selection, tree_output_dir, tournsize, tournparssize)
 
-  def set_params(self, mu, lmbda, cxpb, mutpb, gcount, popsize, selection, tree_output_dir, tournsize=None, tournparssize=None):
+  def set_params(self, mu, lmbda, cxpb, mutpb, gcount, popsize, cx_tool, selection, tree_output_dir, tournsize=None, tournparssize=None):
     self.tree_output_dir = tree_output_dir
     self.mu = mu
     self.lmbda = lmbda
@@ -53,6 +53,7 @@ class Estimator(BaseEstimator):
         [0, float]
       ],
       'individual_fitness_eval_func': self.eval_mean_squared_error,
+      'cx_tool': cx_tool,
       'selection': selection,
       'tournsize': tournsize,
       'tournparssize': tournparssize

@@ -55,6 +55,8 @@ class GSSetup():
       'mutpb': [0.1], # [0.1, 0.2],
       'gcount': [50],
       'popsize': [100],
+      'cx_tool': ['cxOnePoint', 'cxOnePointLeafBiased', 'cxSemantic']
+      # 'cx_tool': ['cxTwoPoint']
     }
 
 

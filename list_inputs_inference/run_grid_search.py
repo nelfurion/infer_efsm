@@ -4,3 +4,10 @@ from .infer_vending_machine_grid_search import x_y_list as vm_inputs
 
 gs_setup = GSSetup(VMEstimator(), 'vending_machine', vm_inputs)
 gs_setup.run()
+
+        # import sys
+        # print('*****************************', file=sys.stderr)
+        # print('*****************************', file=sys.stderr)
+        # print(str(self.tournparssize), file=sys.stderr)
+        # print('*****************************', file=sys.stderr)
+        # print('*****************************', file=sys.stderr)
