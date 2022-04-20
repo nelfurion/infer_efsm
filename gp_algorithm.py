@@ -151,12 +151,7 @@ class GPListInputAlgorithm:
         self.toolbox.register("compile", gp.compile, pset=self.pset)
 
         self.toolbox.register("evaluate", self.individual_fitness_eval_func or self.eval_mean_squared_error)
-        if self.selection == 'tourn':
-          self.toolbox.register("select", tools.selTournament, tournsize=self.tournsize)
-        # elif self.selection == 'tourn_dcd':
-        #   self.toolbox.register("select", tools.selTournamentDCD)
-        elif self.selection == 'tourn_double':
-          self.toolbox.register("select", tools.selDoubleTournament, fitness_size=self.tournsize, parsimony_size=self.tournparssize, fitness_first=True)
+        self.addSelectionTool()
 
         self.toolbox.register("mate", gp.cxOnePointLeafBiased, termpb=0.1)
         # self.toolbox.register("expr_mut", gp.genHalfAndHalf, min_=0, max_=10)
@@ -168,6 +163,35 @@ class GPListInputAlgorithm:
         # Koza in his book on genetic programming suggest to use a max depth of 17.
         self.toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
         self.toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+
+    def addSelectionTool(self):
+      if self.selection == 'sel_tourn':
+        self.toolbox.register("select", tools.selTournament, tournsize=self.tournsize)
+      # elif self.selection == 'sel_tourn_dcd':
+      #   self.toolbox.register("select", tools.selTournamentDCD)
+      elif self.selection == 'sel_tourn_double':
+        import sys
+        print('*****************************', file=sys.stderr)
+        print('*****************************', file=sys.stderr)
+        print(str(self.tournparssize), file=sys.stderr)
+        print('*****************************', file=sys.stderr)
+        print('*****************************', file=sys.stderr)
+        self.toolbox.register("select", tools.selDoubleTournament, fitness_size=self.tournsize, parsimony_size=self.tournparssize, fitness_first=True)
+      elif self.selection == 'sel_random':
+        self.toolbox.register("select", tools.selRandom)
+      elif self.selection == 'sel_best':
+        self.toolbox.register("select", tools.selBest)
+      elif self.selection == 'sel_worst':
+        self.toolbox.register("select", tools.selWorst)
+      elif self.selection == 'sel_stoch':
+        self.toolbox.register("select", tools.selStochasticUniversalSampling)
+      elif self.selection == 'sel_lexicase':
+        self.toolbox.register("select", tools.selLexicase)
+      elif self.selection == 'sel_eps_lexicase':
+        self.toolbox.register("select", tools.selEpsilonLexicase, epsilon=0.5)
+      elif self.selection == 'sel_auto_eps_lexicase':
+        self.toolbox.register("select", tools.selAutomaticEpsilonLexicase)
+
 
     def score(self, x, y):
       return self.individual_fitness_eval_func(

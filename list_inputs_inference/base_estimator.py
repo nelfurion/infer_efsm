@@ -3,6 +3,7 @@ from deap import algorithms
 from gp_algorithm import GPListInputAlgorithm
 from lib import generate_random_string
 from plot import plot_tree
+import uuid
 
 class BaseEstimator():
   def fit(self, target_x_y, y):
@@ -24,7 +25,9 @@ class BaseEstimator():
     self.gpa.run()
     self.estimator = self.gpa.get_best_tree()
     try:
-      plot_tree(self.estimator, self.inferrence_tree_file_name_prefix + str(self.gpa.score(target_x_y, y)[0]) + "--" + str(self.get_params()) + generate_random_string(10))
+      filepath = self.tree_output_dir + str(self.gpa.score(target_x_y, y)[0]) + "--" + str(uuid.uuid4())
+      plot_tree(self.estimator, filepath)
+      print('Tree saved to file: ' + filepath)
     except Exception as e:
       print(e)
 

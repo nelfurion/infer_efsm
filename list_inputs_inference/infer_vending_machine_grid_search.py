@@ -1,3 +1,4 @@
+import copy
 from pathlib import Path
 
 from list_inputs_inference.base_estimator import BaseEstimator
@@ -6,21 +7,21 @@ from sklearn.model_selection import GridSearchCV
 import operator
 import math
 import numbers
-
+import sys
 
 import pandas as pd
 
 from custom_operators import protectedDivision, safe_binary_operation
 from traces.trace_parser import TraceParser
 
-global dir
+global treedir
 
 class Estimator(BaseEstimator):
-  def __init__(self, mu=10, lmbda=20, cxpb=0.2, mutpb=0.1, gcount=50, popsize=300, tournsize=None, tournparssize=None, selection='tournament'):
-    self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, selection, tournsize, tournparssize)
-    self.inferrence_tree_file_name_prefix = dir
+  def __init__(self, mu=10, lmbda=20, cxpb=0.2, mutpb=0.1, gcount=50, popsize=300, selection='tournament', tree_output_dir='', tournsize=None, tournparssize=None):
+    self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, selection, tree_output_dir, tournsize, tournparssize)
 
-  def set_params(self, mu, lmbda, cxpb, mutpb, gcount, popsize, selection, tournsize=None, tournparssize=None):
+  def set_params(self, mu, lmbda, cxpb, mutpb, gcount, popsize, selection, tree_output_dir, tournsize=None, tournparssize=None):
+    self.tree_output_dir = tree_output_dir
     self.mu = mu
     self.lmbda = lmbda
     self.cxpb = cxpb
@@ -141,76 +142,8 @@ tp = TraceParser('./traces/vending_machine/traces_3855')
 event_args_length, events = tp.parse()
 
 
-
-# TOURNAMENT SELECTION
-
 x_y_list = events['coin']
 
-# for i in range(21,22):
-#   dir = './results/vending_machine/' + str(i) + '/'
-#   Path(dir).mkdir(parents=True, exist_ok=True)
-#   grid_search = GridSearchCV(
-#     estimator=Estimator(dir), 
-#     param_grid={
-#       'mu': [5, 10],
-#       'lmbda': [10], #[10, 20],
-#       'cxpb': [0.1], #[0.1, 0.2],
-#       'mutpb': [0.1], # [0.1, 0.2],
-#       'gcount': [50, 1000],
-#       'popsize': [100, 300, 1000],
-#       'tournsize': [2, 4, 7],
-#       'selection': ['tourn']
-#     }
-#   )
-
-#   grid_search.fit(x_y_list, x_y_list)
-#   dataframe = pd.DataFrame(grid_search.cv_results_)
-#   dataframe.to_csv('./results/vending_machine/result' + '_' + str(i) + '.csv')
 
 
-#  DCD TOURNAMENT SELECTION
 
-# for i in range(23,24):
-#   dir = './results/vending_machine/' + str(i) + '/'
-#   Path(dir).mkdir(parents=True, exist_ok=True)
-#   grid_search = GridSearchCV(
-#     estimator=Estimator(dir), 
-#     param_grid={
-#       'mu': [5, 10],
-#       'lmbda': [10], #[10, 20],
-#       'cxpb': [0.1], #[0.1, 0.2],
-#       'mutpb': [0.1], # [0.1, 0.2],
-#       'gcount': [50],
-#       'popsize': [100],
-#       'selection': ['tourn_dcd']
-#     }
-#   )
-
-#   grid_search.fit(x_y_list, x_y_list)
-#   dataframe = pd.DataFrame(grid_search.cv_results_)
-#   dataframe.to_csv('./results/vending_machine/result' + '_' + str(i) + '.csv')
-
-
-#  DOUBLE TOURNAMENT SELECTION
-
-for i in range(25,26):
-  dir = './results/vending_machine/' + str(i) + '/'
-  Path(dir).mkdir(parents=True, exist_ok=True)
-  grid_search = GridSearchCV(
-    estimator=Estimator(dir), 
-    param_grid={
-      'mu': [5, 10],
-      'lmbda': [10], #[10, 20],
-      'cxpb': [0.1], #[0.1, 0.2],
-      'mutpb': [0.1], # [0.1, 0.2],
-      'gcount': [50],
-      'popsize': [100],
-      'tournsize': [4],
-      'tournparssize': [1.1, 1.4, 1.7],
-      'selection': ['tourn_double']
-    }
-  )
-
-  grid_search.fit(x_y_list, x_y_list)
-  dataframe = pd.DataFrame(grid_search.cv_results_)
-  dataframe.to_csv('./results/vending_machine/result' + '_' + str(i) + '.csv')
