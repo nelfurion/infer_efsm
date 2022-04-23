@@ -22,7 +22,9 @@ import dill as pickle
 
 gs_setup = GSSetup(VMEstimator(), 'eaMuPlusLambda', 'vending_machine', vm_inputs, vm_outputs)
 if __name__ == '__main__':
-  # gs_setup.run()
+  print('SYS ARGV')
+  print(sys.argv)
+  gs_setup.run()
   print('Done')
 
 # if __name__ == '__main__':

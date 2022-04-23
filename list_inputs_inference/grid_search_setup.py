@@ -55,29 +55,42 @@ class GSSetup():
       'popsize': [500, 1000, 10000],#[100, 1000, 10000],
       'cx_tool': ['cxOnePoint', 'cxOnePointLeafBiased', 'cxSemantic'],
       'mut_tool': ['mutShrink', 'mutUniform', 'mutNodeReplacement', 'mutInsert', 'mutSemantic'],
-      'tournsize': ['N/A'],
-      'tournparssize': ['N/A'],
+      'tournsize': [7],
+      'tournparssize': [1.4],
     }
 
+
+    # common_params_grid = {
+    #   'mu': [5], #[5, 10, 100],
+    #   'lmbda': [10, 1], #[10, 50, 100], #[10, 20],
+    #   'cxpb': [0.1], #[0.1, 0.5, 0.8], #[0.1, 0.2],
+    #   'mutpb': [0.1], #[0.1, 0.15, 0.2], # [0.1, 0.2],
+    #   'gcount': [50],#[50, 1000],
+    #   'popsize': [500],#[100, 1000, 10000],
+    #   'cx_tool': ['cxOnePoint'],
+    #   'mut_tool': ['mutShrink'],
+    #   'tournsize': [7],
+    #   'tournparssize': [1.4],
+    # }
 
     # TOURNAMENT SELECTION
 
 
-    selection = 'sel_tourn'
+    # selection = 'sel_tourn'
+    selection = sys.argv[1]
     dir =  self.results_function_dir + selection + '/'
     Path(dir).mkdir(parents=True, exist_ok=True)
 
     params_grid = copy.deepcopy(common_params_grid)
-    params_grid['tournsize'] = [7] # [2, 4, 7],
-    params_grid['selection'] = [selection]
     params_grid['tree_output_dir'] = [dir]
+    params_grid['selection'] = [selection]
 
     self._run_grid_search_cv_and_log(dir, self.function_inputs, self.function_outputs, params_grid)
 
     print('***************************', file=sys.stderr)
     print('***************************', file=sys.stderr)
     print('***************************', file=sys.stderr)
-    print("TOURNAMENT SELECTION DONE", file=sys.stderr)
+    print(str(selection), " SELECTION DONE", file=sys.stderr)
     print('***************************', file=sys.stderr)
     print('***************************', file=sys.stderr)
     print('***************************', file=sys.stderr)
@@ -85,52 +98,51 @@ class GSSetup():
     # DOUBLE TOURNAMENT SELECTION
 
 
-    selection = 'sel_tourn_double'
-    dir =  self.results_function_dir + selection + '/'
-    Path(dir).mkdir(parents=True, exist_ok=True)
+    # selection = 'sel_tourn_double'
+    # dir =  self.results_function_dir + selection + '/'
+    # Path(dir).mkdir(parents=True, exist_ok=True)
 
-    params_grid = copy.deepcopy(common_params_grid)
-    params_grid['tournsize'] = [7] # [2, 4, 7],
-    params_grid['tournparssize'] = [1.4] #[1.1, 1.4, 1.7],
-    params_grid['selection'] = [selection]
-    params_grid['tree_output_dir'] = [dir]
+    # params_grid = copy.deepcopy(common_params_grid)
 
-    self._run_grid_search_cv_and_log(dir, self.function_inputs, self.function_outputs, params_grid)
+    # params_grid['selection'] = [selection]
+    # params_grid['tree_output_dir'] = [dir]
+
+    # self._run_grid_search_cv_and_log(dir, self.function_inputs, self.function_outputs, params_grid)
 
 
-    print('***************************', file=sys.stderr)
-    print('***************************', file=sys.stderr)
-    print('***************************', file=sys.stderr)
-    print("DOUBLE SELECTION DONE", file=sys.stderr)
-    print('***************************', file=sys.stderr)
-    print('***************************', file=sys.stderr)
-    print('***************************', file=sys.stderr)
+    # print('***************************', file=sys.stderr)
+    # print('***************************', file=sys.stderr)
+    # print('***************************', file=sys.stderr)
+    # print("DOUBLE SELECTION DONE", file=sys.stderr)
+    # print('***************************', file=sys.stderr)
+    # print('***************************', file=sys.stderr)
+    # print('***************************', file=sys.stderr)
 
     # #  RANDOM SELECTION
 
-    selection_operators = ['sel_best', 'sel_stoch', 'sel_lexicase', 'sel_auto_eps_lexicase']
-    for selection in selection_operators:
-      dir =  self.results_function_dir + selection + '/'
-      Path(dir).mkdir(parents=True, exist_ok=True)
+    # selection_operators = ['sel_best', 'sel_stoch', 'sel_lexicase', 'sel_auto_eps_lexicase']
+    # for selection in selection_operators:
+    #   dir =  self.results_function_dir + selection + '/'
+    #   Path(dir).mkdir(parents=True, exist_ok=True)
 
-      params_grid = copy.deepcopy(common_params_grid)
-      params_grid['selection'] = [selection]
-      params_grid['tree_output_dir'] = [dir]
+    #   params_grid = copy.deepcopy(common_params_grid)
+    #   params_grid['selection'] = [selection]
+    #   params_grid['tree_output_dir'] = [dir]
 
-      self._run_grid_search_cv_and_log(dir, self.function_inputs, self.function_outputs, params_grid)
+    #   self._run_grid_search_cv_and_log(dir, self.function_inputs, self.function_outputs, params_grid)
 
-      print('***************************', file=sys.stderr)
-      print('***************************', file=sys.stderr)
-      print('***************************', file=sys.stderr)
-      print(selection + " DONE", file=sys.stderr)
-      print('***************************', file=sys.stderr)
-      print('***************************', file=sys.stderr)
-      print('***************************', file=sys.stderr)
+    #   print('***************************', file=sys.stderr)
+    #   print('***************************', file=sys.stderr)
+    #   print('***************************', file=sys.stderr)
+    #   print(selection + " DONE", file=sys.stderr)
+    #   print('***************************', file=sys.stderr)
+    #   print('***************************', file=sys.stderr)
+    #   print('***************************', file=sys.stderr)
 
   def _run_grid_search_cv_and_log(self, dir, inputs, outputs, params_grid):
     grid_search = GridSearchCV(
-      cv=ShuffleSplit(n_splits=150, test_size=0.1, random_state=7),
-      n_jobs=multiprocessing.cpu_count()-1, #use all available processors
+      cv=ShuffleSplit(n_splits=5, test_size=0.1, random_state=7),
+      n_jobs=multiprocessing.cpu_count(), #use all available processors
       error_score='raise',
       estimator=self.estimator, 
       verbose=10,

@@ -1,0 +1,2 @@
+    params_grid['tournsize'] = [7] # [2, 4, 7],
+    params_grid['tournparssize'] = [1.4] #[1.1, 1.4, 1.7],
