@@ -151,4 +151,5 @@ class GSSetup():
 
     grid_search.fit(inputs, outputs)
     dataframe = pd.DataFrame(grid_search.cv_results_)
-    dataframe.to_csv(dir + 'result' + '_' + '.csv')
+
+    dataframe.to_csv(dir + 'result' + '_' + sys.argv[2] + '.csv')
