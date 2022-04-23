@@ -16,8 +16,8 @@ import dill as pickle
 #     sys.modules['scoop.futures'].__dict__.get("_controller", None)
 # )
 
-print("futures_not_loaded: ", futures_not_loaded)
-print("controller_not_started: ", controller_not_started)
+# print("futures_not_loaded: ", futures_not_loaded)
+# print("controller_not_started: ", controller_not_started)
 
 
 gs_setup = GSSetup(VMEstimator(), 'eaMuPlusLambda', 'vending_machine', vm_inputs, vm_outputs)
