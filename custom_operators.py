@@ -9,14 +9,12 @@ def protectedDivision(left, right):
 def safe_binary_operation(func, default_value):
     
     def op(arg1, arg2):
-        # print(type(arg1), ' ', type(arg2))
         res = None
         try:
             arg1 + 1
             arg2 + 1
             res = func(arg1, arg2)
         except ValueError as e:
-            # print(e)
             res = default_value
         return res
 

@@ -9,15 +9,15 @@ def generate_random_string(length = 3):
 
 tg = TraceGenerator('vending_machine')
 tg.generate(
-  'select("tea"), coin(50)/[5000], coin(4950)/[5000], vend()/["tea"]',
+  'select("tea"), coin(50)/[50], coin(5950)/[6000], vend()/["tea"]',
   {
     'select': lambda prev_inputs, prev_outputs: f'"{generate_random_string()}"',
     'select_output': lambda prev_inputs, prev_outputs: '',
-    'coin': lambda prev_inputs, prev_outputs: 5000 - prev_inputs[1] if len(prev_inputs) > 1 else random.randint(0, 4999),
+    'coin': lambda prev_inputs, prev_outputs: 1000 - prev_inputs[1] if len(prev_inputs) > 1 else random.randint(0, 999),
     'coin_output': lambda prev_inputs, prev_outputs: prev_inputs[1] if len(prev_inputs) == 2 else prev_inputs[1] + prev_inputs[2],
     'vend': lambda prev_inputs, prev_outputs: '',
     'vend_output': lambda prev_inputs, prev_outputs: prev_inputs[0]
   },
-  5000
+  6000
 )
 tg.write_to_file()

@@ -1,5 +1,0 @@
-# this simple vending machine can be modeled with an EFSM with 3 states - start, middle, final
-
-select("tea"), coin(50)/[50], coin(50)/[100], vend()/["tea"]
-select("tea"), coin(100)/[100], vend()/["tea"]
-select("coffee"), coin(50)/[50], coin(50)/[100], vend()/["coffee"]

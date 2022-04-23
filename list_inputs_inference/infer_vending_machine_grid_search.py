@@ -14,8 +14,6 @@ import pandas as pd
 from custom_operators import protectedDivision, safe_binary_operation
 from traces.trace_parser import TraceParser
 
-global treedir
-
 class Estimator(BaseEstimator):
   def __init__(self, mu=None, lmbda=None, cxpb=None, mutpb=None, gcount=None, popsize=None, mut_tool=None, cx_tool=None, selection=None, tree_output_dir=None, tournsize=None, tournparssize=None):
     self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize, tournparssize)
@@ -67,36 +65,14 @@ class Estimator(BaseEstimator):
 
     return self
 
-  def get_params(self, deep=False):
-    params = {
-      'mu': self.mu,
-      'lmbda': self.lmbda,
-      'cxpb': self.cxpb,
-      'mutpb': self.mutpb,
-      'gcount': self.gcount,
-      'popsize': self.popsize,
-      'mut_tool': self.mut_tool,
-      'cx_tool': self.cx_tool,
-      'selection': self.selection,
-      'tournsize': self.tournsize,
-      'tournparssize': self.tournparssize
-    }
-
-    return params
-
   def eval_mean_squared_error(self, individual, test_x_y_list=None, y_only_list=None):
         # Transform the tree expression in a callable function
         tree_expression = self.gpa.toolbox.compile(expr=individual)
         # Evaluate the mean squared error between the expression
         # and the real function : x**4 + x**3 + x**2 + x
 
-        # print('x_y_list: ', x_y_list)
-        # print('self.target_list: ', self.target_list)
-
         squared_errors = []
         for x_y in (test_x_y_list or self.gpa.target_list):
-          # print(func(x_y[0]))
-          # print(x_y[1])
           try:
             # EDIT THIS
             # THIS IS JUST TEST IMPLEMENTATION OF RUNNING A FUNCTION MULTIPLE TIMES WITH A SINGLE PARAMETER
@@ -105,47 +81,37 @@ class Estimator(BaseEstimator):
             # the params for the coin event are from indexes 1 until the end of the array
             # FIX THIS PART
             params = x_y[0][1:]
-            # print('params: ', params)
 
             registers = [0, 0, 0, 0, 0]
-            output_condition_elements = []
-            output_elements = []
-
             tree_expression_result = None
+
             # lets try to call the tree multiple times with a single parameter each time
             for param in params:
-
-              # print('calling tree with param: ', param)
-              # print('registers: ', registers)
               # pass the param in a list, so that we don't have to change the pick_array_element implementation
               # we will hardcode it to only work for the 0th index of the input, and also for 5 more indexes for 
               # custom registers.
               param_and_registers = [param] + registers # + [output_condition_elements, output_elements]
-              # print('params list: ', params, ' CALLING WITH: ', param_and_registers)
-              # print('TREE: ', individual)
+
               tree_expression_result = tree_expression(param_and_registers)
               registers = param_and_registers[-5:]
-            # tree_expression_result = tree_expression(x_y[0]) // this is old code
 
             # only use the last tree expression result from above
             squared_error = (tree_expression_result - x_y[1]) ** 2
             squared_errors.append(squared_error)
 
-            # print('------------------')
           except Exception as e: # if the tree is just: x , then we have array - integer
-            return 100000,
-        # squared_errors = () for x_y in self.target_list)
+            # import traceback
+            # print(e)
+            # print(traceback.format_exc())
+            return math.inf,
 
         return math.fsum(squared_errors) / len(squared_errors) if len(squared_errors) else 20000,
 
-tp = TraceParser('./traces/vending_machine/traces_3855')
+# tp = TraceParser('./traces/vending_machine/traces_3855')
 # tp = TraceParser('./traces/vending_machine/traces_9309')
+tp = TraceParser('./traces/vending_machine/traces_1703')
 
 event_args_length, events = tp.parse()
 
-
 x_y_list = events['coin']
-
-
-
-
+y_list = list(map(lambda s: s[-1], x_y_list))
