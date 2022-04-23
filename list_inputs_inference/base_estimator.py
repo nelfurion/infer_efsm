@@ -26,20 +26,20 @@ class BaseEstimator():
     logbook = self.gpa.run()   
     self.estimator = self.gpa.get_best_tree()
 
-    try:
-      id = str(uuid.uuid4())
-      filepath = self.tree_output_dir + str(self.gpa.score(target_x_y, y)[0]) + "--" + id
-      plot_tree(self.estimator, filepath)
+    # try:
+    #   id = str(uuid.uuid4())
+    #   filepath = self.tree_output_dir + str(self.gpa.score(target_x_y, y)[0]) + "--" + id
+    #   plot_tree(self.estimator, filepath)
       
-      logbook_dataframe = pd.DataFrame(logbook)
-      logbook_dataframe.to_csv(filepath + '--log.csv', index=False)
+    #   logbook_dataframe = pd.DataFrame(logbook)
+    #   logbook_dataframe.to_csv(filepath + '--log.csv', index=False)
 
-      with open(filepath + '--params.txt', 'w') as the_file:
-        the_file.write(str(self.get_params()))
+    #   with open(filepath + '--params.txt', 'w') as the_file:
+    #     the_file.write(str(self.get_params()))
 
-      print('Tree saved to file: ' + filepath)
-    except Exception as e:
-      print(e)
+    #   print('Tree saved to file: ' + filepath)
+    # except Exception as e:
+    #   print(e)
 
     return self
 

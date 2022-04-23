@@ -9,7 +9,7 @@ from deap import creator
 from deap import tools
 from deap import gp
 
-from scoop import futures
+# from scoop import futures
 
 from custom_operators import pick_arr_el, set_arr_el
 
@@ -163,8 +163,8 @@ class GPListInputAlgorithm:
         self.toolbox.register("evaluate", self.individual_fitness_eval_func)
 
         # makes the GP run in multiprocessing
-        if __name__ == '__main__':
-          self.toolbox.register("map", futures.map)
+        # if __name__ == '__main__':
+        #   self.toolbox.register("map", futures.map)
 
         self.addSelectionTool()
         self.addCrossOverTool()

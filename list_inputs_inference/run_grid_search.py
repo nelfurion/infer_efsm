@@ -1,3 +1,7 @@
+import sys, os
+# sys.path.append("..")
+sys.path.append(os.getcwd())
+
 import datetime
 
 from list_inputs_inference.grid_search_setup import GSSetup
@@ -6,9 +10,6 @@ from list_inputs_inference.infer_vending_machine_grid_search import x_y_list as 
 from list_inputs_inference.infer_vending_machine_grid_search import y_list as vm_outputs
 
 import dill as pickle
-
-import sys
-sys.path.append("..")
 
 futures_not_loaded = 'scoop.futures' not in sys.modules
 controller_not_started = not (
@@ -21,7 +22,8 @@ print("controller_not_started: ", controller_not_started)
 
 gs_setup = GSSetup(VMEstimator(), 'eaMuPlusLambda', 'vending_machine', vm_inputs, vm_outputs)
 if __name__ == '__main__':
-  gs_setup.run()
+  # gs_setup.run()
+  print('Done')
 
 # if __name__ == '__main__':
   
