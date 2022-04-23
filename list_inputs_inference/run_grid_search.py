@@ -11,10 +11,10 @@ from list_inputs_inference.infer_vending_machine_grid_search import y_list as vm
 
 import dill as pickle
 
-futures_not_loaded = 'scoop.futures' not in sys.modules
-controller_not_started = not (
-    sys.modules['scoop.futures'].__dict__.get("_controller", None)
-)
+# futures_not_loaded = 'scoop.futures' not in sys.modules
+# controller_not_started = not (
+#     sys.modules['scoop.futures'].__dict__.get("_controller", None)
+# )
 
 print("futures_not_loaded: ", futures_not_loaded)
 print("controller_not_started: ", controller_not_started)
