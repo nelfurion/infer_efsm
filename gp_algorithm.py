@@ -9,6 +9,8 @@ from deap import creator
 from deap import tools
 from deap import gp
 
+from stats import Stats
+
 # from scoop import futures
 
 from custom_operators import pick_arr_el, set_arr_el
@@ -240,7 +242,8 @@ class GPListInputAlgorithm:
     def add_stats(self):
         stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
         stats_size = tools.Statistics(len)
-        self.mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+        # self.mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+        self.mstats = Stats(fitness=stats_fit, size=stats_size)
         self.mstats.register("avg", numpy.mean)
         self.mstats.register("std", numpy.std)
         self.mstats.register("min", numpy.min)

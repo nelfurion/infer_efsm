@@ -5,6 +5,12 @@ from lib import generate_random_string
 from plot import plot_tree
 import uuid
 import pandas as pd
+import numbers
+import sys
+import operator
+from multiprocessing import Lock
+
+mutex = Lock()
 
 class BaseEstimator():
   def fit(self, target_x_y, y):
@@ -23,23 +29,81 @@ class BaseEstimator():
     )
 
     self.gpa = GPListInputAlgorithm.create(self.setup)
-    logbook = self.gpa.run()   
+    self.gpa.run()
+
     self.estimator = self.gpa.get_best_tree()
 
-    # try:
-    #   id = str(uuid.uuid4())
-    #   filepath = self.tree_output_dir + str(self.gpa.score(target_x_y, y)[0]) + "--" + id
-    #   plot_tree(self.estimator, filepath)
-      
-    #   logbook_dataframe = pd.DataFrame(logbook)
-    #   logbook_dataframe.to_csv(filepath + '--log.csv', index=False)
+    best_tree_stats_string = self.gpa.mstats.get_best_generation_stats_string(self.estimator)
 
-    #   with open(filepath + '--params.txt', 'w') as the_file:
-    #     the_file.write(str(self.get_params()))
+    # for some reason the GSCV is fit one more time after all runs are done, and it does not have the tree_output_dir param
+    if self.tree_output_dir:
+      with mutex:
+        with open(self.tree_output_dir + 'best_trees_' + sys.argv[2] + '.csv', 'a') as best_trees_csv:
+          best_trees_csv.write(str(self.get_params()) + ',' + best_tree_stats_string)
+          best_trees_csv.write('\n')
 
-    #   print('Tree saved to file: ' + filepath)
-    # except Exception as e:
-    #   print(e)
+    return self
+
+  def set_params(self, mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize=None, tournparssize=None):
+    self.tree_output_dir = tree_output_dir
+    self.mu = mu
+    self.lmbda = lmbda
+    self.cxpb = cxpb
+    self.mutpb = mutpb
+    self.gcount = gcount
+    self.popsize = popsize
+    self.mut_tool = mut_tool
+    self.cx_tool = cx_tool
+    self.selection = selection
+    self.tournsize = tournsize
+    self.tournparssize = tournparssize
+
+    self.setup = {
+      'population_size': popsize,
+      'hall_of_fame_size': 2,
+      'input_list_length': 1, # hardcoding it to only accept a single argument # event_args_length,
+      'output_type': float,
+      'generations_count': gcount,
+      'primitives': [
+        # [safe_binary_operation(operator.add, 0), [float, float], float, 'add'],
+        # [safe_binary_operation(operator.sub, 0), [float, float], float, 'sub'],
+        # [safe_binary_operation(operator.mul, 0), [float, float], float, 'mul'],
+        # [protectedDivision, [float, float], float, 'div']
+        [operator.add, [float, float], float, 'add'],
+        [operator.sub, [float, float], float, 'sub'],
+        [operator.mul, [numbers.Complex, numbers.Complex], float, 'mul'],
+        [operator.truediv, [numbers.Complex, numbers.Complex], float, 'div'],
+
+        [operator.ge, [float, float], bool, 'ge'],
+        [operator.gt, [numbers.Complex, numbers.Complex], bool, 'gt'],
+        [operator.le, [float, float], bool, 'le'],
+        [operator.lt, [numbers.Complex, numbers.Complex], bool, 'lt'],
+        [operator.eq, [float, float], bool, 'eq'],
+        [operator.not_, [bool], bool, 'my_not'],
+        [lambda bool, str_1, str_2: str_1 if bool else str_2 , [bool, str, str], str, 'str_if_else'],
+      ],
+      'terminals':[
+        [1, float],
+        [0, float],
+        [100, float],
+        [18.5, float],
+        [24.9, float],
+        [True, bool],
+        [False, bool],
+        ['healthy', str],
+        ['underweight', str],
+        ['overweight', str]
+      ],
+      'individual_fitness_eval_func': self.fitness_eval_fun,
+      'mut_tool': mut_tool,
+      'cx_tool': cx_tool,
+      'selection': selection,
+      'tournsize': tournsize,
+      'tournparssize': tournparssize
+    }
+
+    self.estimator = None
+    self.gpa = None
 
     return self
 

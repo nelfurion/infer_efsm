@@ -63,7 +63,7 @@ class GSSetup():
     # common_params_grid = {
     #   'mu': [5], #[5, 10, 100],
     #   'lmbda': [10, 1], #[10, 50, 100], #[10, 20],
-    #   'cxpb': [0.1], #[0.1, 0.5, 0.8], #[0.1, 0.2],
+    #   'cxpb': [0.1, 0.5], #[0.1, 0.5, 0.8], #[0.1, 0.2],
     #   'mutpb': [0.1], #[0.1, 0.15, 0.2], # [0.1, 0.2],
     #   'gcount': [50],#[50, 1000],
     #   'popsize': [500],#[100, 1000, 10000],
@@ -143,6 +143,7 @@ class GSSetup():
     grid_search = GridSearchCV(
       cv=ShuffleSplit(n_splits=5, test_size=0.1, random_state=7),
       n_jobs=multiprocessing.cpu_count(), #use all available processors
+      pre_dispatch= multiprocessing.cpu_count() * 1.5, # Controls the number of jobs that get dispatched during parallel execution. Reducing this number can be useful to avoid an explosion of memory consumption when more jobs get dispatched than CPUs can process.
       error_score='raise',
       estimator=self.estimator, 
       verbose=10,

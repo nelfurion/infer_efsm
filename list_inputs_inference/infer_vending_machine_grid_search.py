@@ -4,10 +4,7 @@ from pathlib import Path
 from list_inputs_inference.base_estimator import BaseEstimator
 from sklearn.model_selection import GridSearchCV
 
-import operator
 import math
-import numbers
-import sys
 
 import pandas as pd
 
@@ -18,54 +15,8 @@ class Estimator(BaseEstimator):
   def __init__(self, mu=None, lmbda=None, cxpb=None, mutpb=None, gcount=None, popsize=None, mut_tool=None, cx_tool=None, selection=None, tree_output_dir=None, tournsize=None, tournparssize=None):
     self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize, tournparssize)
 
-  def set_params(self, mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize=None, tournparssize=None):
-    self.tree_output_dir = tree_output_dir
-    self.mu = mu
-    self.lmbda = lmbda
-    self.cxpb = cxpb
-    self.mutpb = mutpb
-    self.gcount = gcount
-    self.popsize = popsize
-    self.mut_tool = mut_tool
-    self.cx_tool = cx_tool
-    self.selection = selection
-    self.tournsize = tournsize
-    self.tournparssize = tournparssize
-
-    self.setup = {
-      'population_size': popsize,
-      'hall_of_fame_size': 2,
-      'input_list_length': 1, # hardcoding it to only accept a single argument # event_args_length,
-      'output_type': float,
-      'generations_count': gcount,
-      'primitives': [
-        # [safe_binary_operation(operator.add, 0), [float, float], float, 'add'],
-        # [safe_binary_operation(operator.sub, 0), [float, float], float, 'sub'],
-        # [safe_binary_operation(operator.mul, 0), [float, float], float, 'mul'],
-        # [protectedDivision, [float, float], float, 'div']
-        [operator.add, [float, float], float, 'add'],
-        [operator.sub, [float, float], float, 'sub'],
-        [operator.mul, [numbers.Complex, numbers.Complex], float, 'mul'],
-        [operator.truediv, [numbers.Complex, numbers.Complex], float, 'div'],
-      ],
-      'terminals':[
-        [1, float],
-        [0, float]
-      ],
-      'individual_fitness_eval_func': self.eval_mean_squared_error,
-      'mut_tool': mut_tool,
-      'cx_tool': cx_tool,
-      'selection': selection,
-      'tournsize': tournsize,
-      'tournparssize': tournparssize
-    }
-
-    self.estimator = None
-    self.gpa = None
-
-    return self
-
-  def eval_mean_squared_error(self, individual, test_x_y_list=None, y_only_list=None):
+  # MEAN SQUARED ERORR ON LOOP
+  def fitness_eval_fun(self, individual, test_x_y_list=None, y_only_list=None):
         # Transform the tree expression in a callable function
         tree_expression = self.gpa.toolbox.compile(expr=individual)
         # Evaluate the mean squared error between the expression
@@ -105,7 +56,7 @@ class Estimator(BaseEstimator):
             # print(traceback.format_exc())
             return math.inf,
 
-        return math.fsum(squared_errors) / len(squared_errors) if len(squared_errors) else 20000,
+        return math.sqrt(math.fsum(squared_errors) / len(squared_errors)) if len(squared_errors) else math.inf,
 
 # tp = TraceParser('./traces/vending_machine/traces_3855')
 # tp = TraceParser('./traces/vending_machine/traces_9309')
