@@ -3,6 +3,8 @@ import operator
 import numpy
 import math
 
+from mpmath import exp
+
 from deap import algorithms
 from deap import base
 from deap import creator
@@ -197,7 +199,7 @@ class GPListInputAlgorithm:
 
     def _addCxSemanticLFFunc(self):
         def lf(x): 
-          return 1 / (1 + math.exp(-x))
+          return 1 / (1 + exp(-x))
 
         self.pset.addPrimitive(lf, [float], float, name="lf")
 
