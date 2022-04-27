@@ -46,32 +46,32 @@ class GSSetup():
 
     #   log_file.close()
 
-    common_params_grid = {
-      'mu': [5, 10, 100], #[5, 10, 100],
-      'lmbda': [10, 50, 100], #[10, 50, 100], #[10, 20],
-      'cxpb': [0.1, 0.5, 0.8], #[0.1, 0.5, 0.8], #[0.1, 0.2],
-      'mutpb': [0.1, 0.15, 0.2], #[0.1, 0.15, 0.2], # [0.1, 0.2],
-      'gcount': [50, 500, 1000],#[50, 1000],
-      'popsize': [500, 1000, 10000],#[100, 1000, 10000],
-      'cx_tool': ['cxOnePoint', 'cxOnePointLeafBiased', 'cxSemantic'],
-      'mut_tool': ['mutShrink', 'mutUniform', 'mutNodeReplacement', 'mutInsert', 'mutSemantic'],
-      'tournsize': [7],
-      'tournparssize': [1.4],
-    }
-
-
     # common_params_grid = {
-    #   'mu': [5], #[5, 10, 100],
-    #   'lmbda': [10, 1], #[10, 50, 100], #[10, 20],
-    #   'cxpb': [0.1, 0.5], #[0.1, 0.5, 0.8], #[0.1, 0.2],
-    #   'mutpb': [0.1], #[0.1, 0.15, 0.2], # [0.1, 0.2],
-    #   'gcount': [50],#[50, 1000],
-    #   'popsize': [500],#[100, 1000, 10000],
-    #   'cx_tool': ['cxOnePoint'],
-    #   'mut_tool': ['mutShrink'],
+    #   'mu': [5, 10, 100], #[5, 10, 100],
+    #   'lmbda': [10, 50, 100], #[10, 50, 100], #[10, 20],
+    #   'cxpb': [0.1, 0.5, 0.8], #[0.1, 0.5, 0.8], #[0.1, 0.2],
+    #   'mutpb': [0.1, 0.15, 0.2], #[0.1, 0.15, 0.2], # [0.1, 0.2],
+    #   'gcount': [50, 500, 1000],#[50, 1000],
+    #   'popsize': [500, 1000, 10000],#[100, 1000, 10000],
+    #   'cx_tool': ['cxOnePoint', 'cxOnePointLeafBiased', 'cxSemantic'],
+    #   'mut_tool': ['mutShrink', 'mutUniform', 'mutNodeReplacement', 'mutInsert', 'mutSemantic'],
     #   'tournsize': [7],
     #   'tournparssize': [1.4],
     # }
+
+
+    common_params_grid = {
+      'mu': [5, 10, 20, 50, 100], #[5, 10, 100],
+      'lmbda': [5, 10, 20, 50, 100], #[10, 50, 100], #[10, 20],
+      'cxpb': [0.8], #[0.1, 0.5, 0.8], #[0.1, 0.2],
+      'mutpb': [0.15], #[0.1, 0.15, 0.2], # [0.1, 0.2],
+      'gcount': [500],#[50, 1000],
+      'popsize': [1000],#[100, 1000, 10000],
+      'cx_tool': ['cxOnePoint'],
+      'mut_tool': ['mutShrink'],
+      'tournsize': [7],
+      'tournparssize': [1.4],
+    }
 
     # TOURNAMENT SELECTION
 
@@ -141,7 +141,7 @@ class GSSetup():
 
   def _run_grid_search_cv_and_log(self, dir, inputs, outputs, params_grid):
     grid_search = GridSearchCV(
-      cv=ShuffleSplit(n_splits=5, test_size=0.1, random_state=7),
+      cv=ShuffleSplit(n_splits=100, test_size=0.1, random_state=7),
       n_jobs=multiprocessing.cpu_count(), #use all available processors
       pre_dispatch= multiprocessing.cpu_count() * 1.5, # Controls the number of jobs that get dispatched during parallel execution. Reducing this number can be useful to avoid an explosion of memory consumption when more jobs get dispatched than CPUs can process.
       error_score='raise',
