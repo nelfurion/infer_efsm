@@ -1,15 +1,7 @@
-import copy
-from pathlib import Path
-
 from list_inputs_inference.base_estimator import BaseEstimator
-from sklearn.model_selection import GridSearchCV
+from traces.trace_parser import TraceParser
 
 import math
-
-import pandas as pd
-
-from custom_operators import protectedDivision, safe_binary_operation
-from traces.trace_parser import TraceParser
 
 class Estimator(BaseEstimator):
   def __init__(self, mu=None, lmbda=None, cxpb=None, mutpb=None, gcount=None, popsize=None, mut_tool=None, cx_tool=None, selection=None, tree_output_dir=None, tournsize=None, tournparssize=None):

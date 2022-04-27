@@ -1,18 +1,7 @@
 from list_inputs_inference.base_estimator import BaseEstimator
-from sklearn.model_selection import GridSearchCV
-
-import operator, math, numbers
-
-import pandas as pd
-
-from deap import algorithms
-
-from plot import plot_tree
 from traces.trace_parser import TraceParser
 
-from gp_algorithm import GPListInputAlgorithm
-
-
+import math
 
 class Estimator(BaseEstimator):
   def __init__(self, mu=None, lmbda=None, cxpb=None, mutpb=None, gcount=None, popsize=None, mut_tool=None, cx_tool=None, selection=None, tree_output_dir=None, tournsize=None, tournparssize=None):
@@ -77,6 +66,12 @@ class Estimator(BaseEstimator):
 tp = TraceParser('./traces/bmi/traces_9728')
 
 event_args_length, events = tp.parse()
+
+x_y_list = events['bmi']
+y_list = list(map(lambda s: s[-1], x_y_list))
+
+print(x_y_list[0:5])
+print(y_list[0:5])
 
 # print(events['bmi'])
 
