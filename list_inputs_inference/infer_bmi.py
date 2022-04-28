@@ -7,14 +7,6 @@ class Estimator(BaseEstimator):
   def __init__(self, mu=None, lmbda=None, cxpb=None, mutpb=None, gcount=None, popsize=None, mut_tool=None, cx_tool=None, selection=None, tree_output_dir=None, tournsize=None, tournparssize=None):
     self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize, tournparssize)
 
-  def get_params(self, deep=False):
-    return {
-      'mu': self.mu,
-      'lmbda': self.lmbda,
-      'cxpb': self.cxpb,
-      'mutpb': self.mutpb,
-    }
-
   # # test_x_y_list is None during training. During training the self.gpa.target_list is used.
   # # When testing the score of the already trained tree - test_x_y_list is used.
   # # We split the data into training and testing sets.
@@ -70,8 +62,8 @@ event_args_length, events = tp.parse()
 x_y_list = events['bmi']
 y_list = list(map(lambda s: s[-1], x_y_list))
 
-print(x_y_list[0:5])
-print(y_list[0:5])
+# print(x_y_list[0:5])
+# print(y_list[0:5])
 
 # print(events['bmi'])
 
