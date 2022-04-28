@@ -20,10 +20,11 @@ if len(sys.argv) == 1:
   print('2 - Iteration. Each iterations run the setup ONCE through 5-fold Shuffle split with 10% of the data as test size')
   print('Please provide the following parameters:')
 
-gs_setup = GSSetup(VMEstimator(), 'eaMuPlusLambda', 'vending_machine', vm_inputs, vm_outputs)
+gs_setup_vm = GSSetup(VMEstimator(), 'eaMuPlusLambda', 'vending_machine', vm_inputs, vm_outputs)
 gs_setup_bmi = GSSetup(BMIEstimator(), 'eaMuPlusLambda', 'bmi', bmi_inputs, bmi_outputs)
 if __name__ == '__main__':
   print('SYS ARGV')
   print(sys.argv)
   gs_setup_bmi.run()
+  gs_setup_vm.run()
   print('Done')
