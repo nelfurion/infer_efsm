@@ -35,7 +35,7 @@ class GSSetup():
 
   def _run_grid_search_cv_and_log(self, dir, inputs, outputs, params_grid):
     grid_search = GridSearchCV(
-      cv=ShuffleSplit(n_splits=2, test_size=0.1, random_state=7),
+      cv=ShuffleSplit(n_splits=200, test_size=0.1, random_state=7),
       n_jobs=multiprocessing.cpu_count(), #use all available processors
       pre_dispatch= multiprocessing.cpu_count() * 1.5, # Controls the number of jobs that get dispatched during parallel execution. Reducing this number can be useful to avoid an explosion of memory consumption when more jobs get dispatched than CPUs can process.
       error_score='raise',
