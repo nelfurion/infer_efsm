@@ -1,4 +1,0 @@
-[CV 2/5; 725/10935] END cx_tool=cxOnePoint, cxpb=0.1, gcount=500, lmbda=100, mu=10, mut_tool=mutShrink, mutpb=0.15, popsize=1000, selection=sel_tourn, tournparssize=1.4, tournsize=7, tree_output_dir=./results/ea
-MuPlusLambda/vending_machine/sel_tourn/;, score=-170685.272 total time= 2.7min
-[CV 5/5; 726/10935] START cx_tool=cxOnePoint, cxpb=0.1, gcount=500, lmbda=100, mu=10, mut_tool=mutShrink, mutpb=0.15, popsize=10000, selection=sel_tourn, tournparssize=1.4, tournsize=7, tree_output_dir=./results
-/eaMuPlusLambda/vending_machine/sel_tourn/

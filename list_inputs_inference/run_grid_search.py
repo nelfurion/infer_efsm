@@ -14,17 +14,35 @@ from list_inputs_inference.infer_bmi import Estimator as BMIEstimator
 from list_inputs_inference.infer_bmi import x_y_list as bmi_inputs
 from list_inputs_inference.infer_bmi import y_list as bmi_outputs
 
+from list_inputs_inference.infer_odd_even import Estimator as OddEvenEstimator
+from list_inputs_inference.infer_odd_even import x_y_list as odd_even_inputs
+from list_inputs_inference.infer_odd_even import y_list as odd_even_outputs
+
 if len(sys.argv) == 1:
+  print("-------------------------------------------------------------------------------------------------------------------")
   print('Please provide the following parameters:')
   print('1 - Selection operator - one of: sel_tourn, sel_tourn_double, sel_best sel_stoch sel_lexicase sel_auto_eps_lexicase')
   print('2 - Iteration. Each iterations run the setup ONCE through 5-fold Shuffle split with 10% of the data as test size')
-  print('Please provide the following parameters:')
+  print('3 - Function to use - one of [bmi_class, vm, odd_even]')
+  print("-------------------------------------------------------------------------------------------------------------------")
 
-gs_setup_vm = GSSetup(VMEstimator(), 'eaMuPlusLambda', 'vending_machine', vm_inputs, vm_outputs)
-gs_setup_bmi = GSSetup(BMIEstimator(), 'eaMuPlusLambda', 'bmi', bmi_inputs, bmi_outputs)
+  sys.exit()
+
+setup = {
+  'bmi_class': { 
+    'estimator': GSSetup(BMIEstimator(), 'eaMuPlusLambda', 'bmi', bmi_inputs, bmi_outputs)
+  },
+  'vm': {
+    'estimator': GSSetup(VMEstimator(), 'eaMuPlusLambda', 'vending_machine', vm_inputs, vm_outputs)
+  },
+  'odd_even': {
+    'estimator': GSSetup(OddEvenEstimator(), 'eaMuPlusLambda', 'odd_even', odd_even_inputs, odd_even_outputs)
+  }
+}
+
+estimator = setup[sys.argv[3]]['estimator']
 if __name__ == '__main__':
   print('SYS ARGV')
   print(sys.argv)
-  gs_setup_bmi.run()
-  gs_setup_vm.run()
+  estimator.run()
   print('Done')
