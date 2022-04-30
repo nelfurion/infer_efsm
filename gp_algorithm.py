@@ -180,8 +180,8 @@ class GPListInputAlgorithm:
         # Then, we decorate the mate and mutate method to limit the height of generated individuals. 
         # This is done to avoid an important draw back of genetic programming : bloat. 
         # Koza in his book on genetic programming suggest to use a max depth of 17.
-        self.toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
-        self.toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=17))
+        self.toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=7))
+        self.toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=7))
 
     def addMutationTool(self):
       self.toolbox.register("expr_mut", gp.genHalfAndHalf, min_=0, max_=6)
