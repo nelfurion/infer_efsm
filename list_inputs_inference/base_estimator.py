@@ -69,6 +69,7 @@ class BaseEstimator():
         # [safe_binary_operation(operator.sub, 0), [float, float], float, 'sub'],
         # [safe_binary_operation(operator.mul, 0), [float, float], float, 'mul'],
         # [protectedDivision, [float, float], float, 'div']
+        [lambda first, second: int(round(first)) % int(round(second)), [numbers.Complex, numbers.Complex], int, 'mod'],
         [operator.add, [float, float], float, 'add'],
         [operator.sub, [float, float], float, 'sub'],
         [operator.mul, [numbers.Complex, numbers.Complex], float, 'mul'],
@@ -85,6 +86,7 @@ class BaseEstimator():
       'terminals':[
         [1, float],
         [0, float],
+        [2, float],
         [100, float],
         [18.5, float],
         [24.9, float],
@@ -92,7 +94,9 @@ class BaseEstimator():
         [False, bool],
         ['healthy', str],
         ['underweight', str],
-        ['overweight', str]
+        ['overweight', str],
+        ['no', str],
+        ['yes', str]
       ],
       'individual_fitness_eval_func': self.fitness_eval_fun,
       'mut_tool': mut_tool,
