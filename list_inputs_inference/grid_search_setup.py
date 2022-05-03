@@ -41,7 +41,8 @@ class GSSetup():
       error_score='raise',
       estimator=self.estimator, 
       verbose=10,
-      param_grid=params_grid
+      param_grid=params_grid,
+      refit=False
     )
 
     grid_search.fit(inputs, outputs)
