@@ -15,7 +15,7 @@ from stats import Stats
 
 # from scoop import futures
 
-from custom_operators import pick_arr_el, set_arr_el
+from custom_operators import pick_arr_el, set_arr_el, selTournamentDifferent, selTournBestAndWorst
 
 REGISTERS_COUNT = 5
 
@@ -31,7 +31,20 @@ REGISTERS_COUNT = 5
 #   possible outputs to that function we may need an if-elseif-elseif-elseif-then operator and so on.
 
 class GPListInputAlgorithm:
-    def __init__(self, population_size, hof_size, input_types, output_type, list_length, generations_count, individual_fitness_eval_func, mut_tool, cx_tool, selection, tournsize=None, tournparssize=None) -> None:
+    def __init__(self,
+      population_size,
+      hof_size,
+      input_types,
+      output_type,
+      list_length,
+      generations_count,
+      individual_fitness_eval_func,
+      mut_tool, cx_tool,
+      selection,
+      fitness_weights,
+      tournsize=None,
+      tournparssize=None
+    ) -> None:
         self.pset = gp.PrimitiveSetTyped("MAIN", input_types, output_type)
         self.output_type = output_type
         self.toolbox = base.Toolbox()
@@ -57,7 +70,7 @@ class GPListInputAlgorithm:
         self.pset.renameArguments(ARG5="s")
 
         self.add_stats()
-        self.addFitness((-1.0,))
+        self.addFitness(fitness_weights)
         self.addIndividual(gp.PrimitiveTree)
         self.addNecessaryPrimitives()
 
@@ -78,7 +91,8 @@ class GPListInputAlgorithm:
         cx_tool=setup['cx_tool'],
         selection=setup['selection'],
         tournsize=setup['tournsize'],
-        tournparssize=setup['tournparssize']
+        tournparssize=setup['tournparssize'],
+        fitness_weights=setup['fitness_weights'] if 'fitness_weights' in setup.keys() else (-1.0, )
       )
 
       gpa.setPopulationGenerationFunc(setup['population_generation_func'])
@@ -232,7 +246,10 @@ class GPListInputAlgorithm:
         self.toolbox.register("select", tools.selEpsilonLexicase, epsilon=0.5)
       elif self.selection == 'sel_auto_eps_lexicase':
         self.toolbox.register("select", tools.selAutomaticEpsilonLexicase)
-
+      elif self.selection == 'sel_tourn_diff':
+        self.toolbox.register('select', selTournamentDifferent, tournsize=self.tournsize)
+      elif self.selection == 'sel_tourn_best_worst':
+        self.toolbox.register('select', selTournBestAndWorst, tournsize=self.tournsize)
 
     def score(self, x, y):
       return self.individual_fitness_eval_func(
