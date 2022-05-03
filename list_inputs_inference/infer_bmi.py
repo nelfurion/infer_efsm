@@ -4,8 +4,8 @@ from traces.trace_parser import TraceParser
 import math
 
 class Estimator(BaseEstimator):
-  def __init__(self, mu=None, lmbda=None, cxpb=None, mutpb=None, gcount=None, popsize=None, mut_tool=None, cx_tool=None, selection=None, tree_output_dir=None, tournsize=None, tournparssize=None):
-    self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize, tournparssize)
+  def __init__(self, mu=None, lmbda=None, cxpb=None, mutpb=None, gcount=None, popsize=None, mut_tool=None, cx_tool=None, selection=None, tree_output_dir=None, tournsize=None, tournparssize=None, fitness_weights=None, output_type=str):
+    self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize, tournparssize, fitness_weights, output_type)
 
   # # test_x_y_list is None during training. During training the self.gpa.target_list is used.
   # # When testing the score of the already trained tree - test_x_y_list is used.

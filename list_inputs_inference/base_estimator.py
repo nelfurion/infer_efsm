@@ -33,6 +33,8 @@ class BaseEstimator():
 
     self.estimator = self.gpa.get_best_tree()
 
+    print('BEST EST: ', self.estimator)
+
     best_tree_stats_string = self.gpa.mstats.get_best_generation_stats_string(self.estimator)
 
     # for some reason the GSCV is fit one more time after all runs are done, and it does not have the tree_output_dir param
@@ -44,7 +46,7 @@ class BaseEstimator():
 
     return self
 
-  def set_params(self, mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize=None, tournparssize=None):
+  def set_params(self, mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize=None, tournparssize=None, fitness_weights=None, output_type=float):
     self.tree_output_dir = tree_output_dir
     self.mu = mu
     self.lmbda = lmbda
@@ -57,12 +59,14 @@ class BaseEstimator():
     self.selection = selection
     self.tournsize = tournsize
     self.tournparssize = tournparssize
+    self.fitness_weights = fitness_weights
+    self.output_type = output_type
 
     self.setup = {
       'population_size': popsize,
       'hall_of_fame_size': 2,
       'input_list_length': 1, # hardcoding it to only accept a single argument # event_args_length,
-      'output_type': float,
+      'output_type': output_type,
       'generations_count': gcount,
       'primitives': [
         # [safe_binary_operation(operator.add, 0), [float, float], float, 'add'],
@@ -103,7 +107,8 @@ class BaseEstimator():
       'cx_tool': cx_tool,
       'selection': selection,
       'tournsize': tournsize,
-      'tournparssize': tournparssize
+      'tournparssize': tournparssize,
+      'fitness_weights': fitness_weights
     }
 
     self.estimator = None
@@ -123,7 +128,9 @@ class BaseEstimator():
       'cx_tool': self.cx_tool or 'N/A',
       'selection': self.selection or 'N/A',
       'tournsize': self.tournsize or 'N/A',
-      'tournparssize': self.tournparssize or 'N/A'
+      'tournparssize': self.tournparssize or 'N/A',
+      'fitness_weights': self.fitness_weights or 'N/A',
+      'output_type': self.output_type or 'N/A'
     }
 
     return params
@@ -135,4 +142,4 @@ class BaseEstimator():
     return self.gpa.get_best_tree_expression()
 
   def score(self, x, y):
-    return -1 * self.gpa.score(x, y)[0]
+    return -1 * self.gpa.score(x, y)[0] # (-1 * self.gpa.score(x, y)[0], -1 * self.gpa.score(x, y)[1])

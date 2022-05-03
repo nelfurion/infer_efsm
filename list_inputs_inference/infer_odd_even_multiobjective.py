@@ -9,13 +9,50 @@ import math
 
 
 class Estimator(BaseEstimator):
-  def __init__(self, mu=None, lmbda=None, cxpb=None, mutpb=None, gcount=None, popsize=None, mut_tool=None, cx_tool=None, selection=None, tree_output_dir=None, tournsize=None, tournparssize=None, fitness_weights=None, output_type=str):
-    self.set_params(mu, lmbda, cxpb, mutpb, gcount, popsize, mut_tool, cx_tool, selection, tree_output_dir, tournsize, tournparssize, fitness_weights, output_type)
+  def __init__(
+    self,
+    mu=None,
+    lmbda=None,
+    cxpb=None,
+    mutpb=None,
+    gcount=None,
+    popsize=None,
+    mut_tool=None,
+    cx_tool=None,
+    selection=None,
+    tree_output_dir=None,
+    tournsize=None,
+    tournparssize=None,
+    fitness_weights=None,
+    output_type=str
+  ):
+    self.set_params(
+      mu,
+      lmbda,
+      cxpb,
+      mutpb,
+      gcount,
+      popsize,
+      mut_tool,
+      cx_tool,
+      selection,
+      tree_output_dir,
+      tournsize,
+      tournparssize,
+      fitness_weights,
+      output_type
+    )
+
+  def appearance_fitness_eval(self, individual):
+    return 1
 
   # test_x_y_list is None during training. During training the self.gpa.target_list is used.
   # When testing the score of the already trained tree - test_x_y_list is used.
   # We split the data into training and testing sets.
-  def fitness_eval_fun(self, individual, test_x_y_list = None, y_only_list = None):
+  #
+  # Returns
+  #   (actual value, reallistic max value)
+  def expression_fitness_eval(self, individual, test_x_y_list = None, y_only_list = None):
     tree_expression = self.gpa.toolbox.compile(expr=individual)
     squared_errors = []
     # x is a list with a single param [param]
@@ -27,33 +64,20 @@ class Estimator(BaseEstimator):
         if (res != y):
           squared_errors.append(1)
       except (TypeError, ValueError, ZeroDivisionError) as e:
-        return math.inf,
-    
-    return len(squared_errors),
+        return math.inf, math.inf
+  
+    return len(squared_errors), len(test_x_y_list or self.gpa.target_list)
 
-  # def fitness_eval_fun(self, individual, test_x_y_list = None, y_only_list = None):
-  #   tree_expression = self.gpa.toolbox.compile(expr=individual)
-  #   squared_errors = []
-  #   # x is a list with a single param [param]
-  #   # y is a value
-  #   valid_results = ['yes', 'no']
-  #   valid_results_count = 0
-  #   for x, y in (test_x_y_list or self.gpa.target_list):
-  #     registers = [None, None, None, None, None]
-  #     try:
-  #       res = tree_expression(x + registers)
-  #       if res in valid_results:
-  #         valid_results_count += 1
+  def fitness_eval_fun(self, individual, test_x_y_list = None, y_only_list = None):
+    expr_error_score, expr_max_error_score = self.expression_fitness_eval(individual, test_x_y_list)
+    if (expr_error_score == math.inf):
+      return math.inf,
 
-  #       if (res != y):
-  #         squared_errors.append(1)
-  #     except (TypeError, ValueError, ZeroDivisionError) as e:
-  #       return math.inf,
-    
-  #   if valid_results_count == 0:
-  #     return math.inf,
+    appearance_error_score = self.appearance_fitness_eval(individual)
 
-  #   return len(squared_errors),
+    expr_ratio = expr_error_score / expr_max_error_score
+
+    return expr_error_score,
 
 
 
