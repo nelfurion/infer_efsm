@@ -1,3 +1,4 @@
+import sys
 # common_params_grid = {
 #   'mu': [5, 10, 100], #[5, 10, 100],
 #   'lmbda': [10, 50, 100], #[10, 50, 100], #[10, 20],
@@ -11,13 +12,18 @@
 #   'tournparssize': [1.4],
 # }
 
+output_type = {
+  'str': str,
+  'float': float
+}
+
 # MU AND POPSIZE TESTED VALUES
 common_params_grid = {
   'mu': [1000], #[5, 10, 100],
   'lmbda': [10], #[10, 50, 100], #[10, 20],
   'cxpb': [0.8], #[0.1, 0.5, 0.8], #[0.1, 0.2],
   'mutpb': [0.15], #[0.1, 0.15, 0.2], # [0.1, 0.2],
-  'gcount': [500],#[50, 1000],
+  'gcount': [50],#[50, 1000],
   'popsize': [1000],#[100, 1000, 10000],
   'cx_tool': ['cxOnePoint'],
   'mut_tool': ['mutUniform'],
@@ -25,6 +31,8 @@ common_params_grid = {
   # 'mut_tool': ['mutShrink', 'mutUniform', 'mutNodeReplacement', 'mutInsert', 'mutSemantic'],
   'tournsize': [7],
   'tournparssize': [1.4],
+  'fitness_weights': [(-1.0, 1.0)],
+  'output_type': [output_type[sys.argv[4]]]
 }
 
 
