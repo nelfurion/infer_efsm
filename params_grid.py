@@ -31,7 +31,7 @@ common_params_grid = {
   # 'mut_tool': ['mutShrink', 'mutUniform', 'mutNodeReplacement', 'mutInsert', 'mutSemantic'],
   'tournsize': [7],
   'tournparssize': [1.4],
-  'fitness_weights': [(-1.0, 1.0)],
+  'fitness_weights': [(-1.0,)],
   'output_type': [output_type[sys.argv[4]]]
 }
 
